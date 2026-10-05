@@ -1,0 +1,2099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Cyber Knights — Secure Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/style.css" />
+
+  <!-- ============================================================
+       NEW 3D BACKGROUND — Burgundy · Gold · Cream
+       ============================================================ -->
+  <style>
+    /* ---- Background container (fixed, behind everything) ---- */
+    #bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 50% 45%, #2E1120 0%, #240C18 38%, #1A0810 80%);
+    }
+    #bg-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 2s ease;
+    }
+    #bg-canvas.on { opacity: 1; }
+
+    #bg .vig {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 35%, rgba(10, 3, 6, 0.85) 100%);
+      animation: bgBreathe 30s ease-in-out infinite;
+    }
+    @keyframes bgBreathe { 50% { opacity: .6; } }
+
+    #bg .aurora {
+      position: absolute;
+      width: 70vmax;
+      height: 70vmax;
+      left: -20vmax;
+      top: -25vmax;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(178, 58, 72, 0.16), transparent 65%);
+      filter: blur(40px);
+      animation: bgDrift 40s ease-in-out infinite alternate;
+    }
+    #bg .aurora.b {
+      left: auto;
+      right: -25vmax;
+      top: auto;
+      bottom: -30vmax;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.09), transparent 65%);
+      animation-duration: 55s;
+    }
+    @keyframes bgDrift { to { transform: translate(12vmax, 8vmax) scale(1.15); } }
+
+    #bg .ray {
+      position: absolute;
+      top: -20%;
+      width: 30vmax;
+      height: 140%;
+      background: linear-gradient(180deg, rgba(244, 228, 166, 0.05), transparent 75%);
+      filter: blur(18px);
+      transform-origin: top center;
+      mix-blend-mode: screen;
+    }
+    #bg .ray.l { left: -4%; animation: bgSwayL 24s ease-in-out infinite alternate; }
+    #bg .ray.r { right: -4%; animation: bgSwayR 31s ease-in-out infinite alternate; }
+    @keyframes bgSwayL { from { transform: rotate(-26deg); } to { transform: rotate(-16deg); } }
+    @keyframes bgSwayR { from { transform: rotate(26deg); } to { transform: rotate(16deg); } }
+
+    /* ---- Portal body -- Before/After ambient tints (Burgundy + Gold) ---- */
+    body::before {
+      background:
+        radial-gradient(circle at 15% 10%, rgba(212, 175, 55, 0.08), transparent 40%),
+        radial-gradient(circle at 85% 90%, rgba(178, 58, 72, 0.08), transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.04), transparent 60%) !important;
+    }
+    body::after {
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent) !important;
+    }
+
+    /* ============================================================
+       TRANSPARENCY OVERRIDES — Burgundy + Gold Edition
+       ============================================================ */
+    html, body, .view, main, section, header, footer, aside, nav,
+    .topbar, .content, .page, .card, .cards-grid, .info-box,
+    .table-wrap, .data-table, .data-table th, .data-table td,
+    .login-card-clean, .login-page, .login-brand,
+    .modal-overlay, .modal-card, .modal-head, .modal-body,
+    .admin-toolbar, .admin-tabs, .admin-tab-content,
+    .section-block, .section-block-head, .kv-list, .kv-list li,
+    .progress-hero, .progress-card, .progress-breakdown,
+    .assignment-card, .quiz-card, .exam-card,
+    .student-checkbox-list, .quiz-question-block,
+    .quiz-review-item, .quiz-result-row,
+    .form-group input, .form-group select, textarea,
+    .btn-secondary, .mini-btn, .icon-btn,
+    .nav-link, .admin-tab, .chip {
+      background: transparent !important;
+      background-color: transparent !important;
+      background-image: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Keep borders subtle gold glow */
+    .topbar,
+    .content-header,
+    .modal-card,
+    .login-card-clean,
+    .card,
+    .section-block,
+    .info-box,
+    .table-wrap,
+    .admin-toolbar,
+    .progress-hero,
+    .progress-card,
+    .assignment-card,
+    .quiz-card,
+    .exam-card {
+      border: 1px solid rgba(212, 175, 55, 0.18) !important;
+    }
+
+    /* Primary button — rich gold */
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.92) 0%, rgba(139, 105, 20, 0.92) 100%) !important;
+      color: #1A0810 !important;
+      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4), 0 0 40px rgba(212, 175, 55, 0.15) !important;
+    }
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 8px 30px rgba(212, 175, 55, 0.55), 0 0 40px rgba(212, 175, 55, 0.3) !important;
+    }
+
+    .btn-secondary {
+      background: rgba(212, 175, 55, 0.06) !important;
+      border: 1.5px solid rgba(212, 175, 55, 0.28) !important;
+      color: #FAF3E3 !important;
+    }
+    .btn-secondary:hover {
+      background: rgba(212, 175, 55, 0.1) !important;
+      border-color: rgba(212, 175, 55, 0.5) !important;
+      color: #D4AF37 !important;
+    }
+
+    .mini-btn {
+      background: rgba(212, 175, 55, 0.06) !important;
+      border: 1px solid rgba(212, 175, 55, 0.2) !important;
+      color: #D4C5A8 !important;
+    }
+    .mini-btn:hover {
+      background: rgba(212, 175, 55, 0.12) !important;
+      border-color: rgba(212, 175, 55, 0.5) !important;
+      color: #D4AF37 !important;
+    }
+
+    .icon-btn {
+      background: rgba(212, 175, 55, 0.06) !important;
+      border: 1.5px solid rgba(212, 175, 55, 0.22) !important;
+      color: #D4C5A8 !important;
+    }
+    .icon-btn:hover {
+      background: rgba(212, 175, 55, 0.12) !important;
+      border-color: #D4AF37 !important;
+      color: #D4AF37 !important;
+    }
+
+    .nav-link.active {
+      background: rgba(212, 175, 55, 0.08) !important;
+      color: #D4AF37 !important;
+    }
+    .admin-tab.active {
+      background: rgba(212, 175, 55, 0.08) !important;
+      color: #D4AF37 !important;
+    }
+
+    /* Inputs — burgundy dark with gold focus */
+    .form-group input,
+    .form-group select,
+    textarea {
+      background: rgba(26, 8, 16, 0.55) !important;
+      border: 1.5px solid rgba(212, 175, 55, 0.22) !important;
+      color: #FAF3E3 !important;
+    }
+    .form-group input::placeholder,
+    textarea::placeholder {
+      color: rgba(212, 197, 168, 0.5) !important;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    textarea:focus {
+      border-color: rgba(212, 175, 55, 0.7) !important;
+      box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.12), 0 0 20px rgba(212, 175, 55, 0.25) !important;
+      background: rgba(26, 8, 16, 0.75) !important;
+    }
+
+    /* Success overlay — gold glow */
+    .success-msg {
+      background: rgba(46, 17, 32, 0.92) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+      border: 2px solid #D4AF37 !important;
+      color: #D4AF37 !important;
+      box-shadow:
+        0 20px 60px rgba(212, 175, 55, 0.3),
+        0 0 0 8px rgba(212, 175, 55, 0.08),
+        0 0 80px rgba(212, 175, 55, 0.3) !important;
+    }
+    .success-icon { background: #D4AF37 !important; color: #1A0810 !important; }
+
+    /* Toast — burgundy + gold accent */
+    .toast {
+      background: rgba(46, 17, 32, 0.95) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+      border: 1.5px solid rgba(212, 175, 55, 0.3) !important;
+      color: #FAF3E3 !important;
+    }
+    .toast.success { border-left-color: #D4AF37 !important; }
+    .toast.error { border-left-color: #B23A48 !important; }
+    .toast.info { border-left-color: #E8D5B7 !important; }
+
+    /* Tables — burgundy */
+    .data-table th {
+      background: rgba(212, 175, 55, 0.05) !important;
+      color: #D4AF37 !important;
+    }
+    .data-table tr:hover td {
+      background: rgba(212, 175, 55, 0.06) !important;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      background: rgba(26, 8, 16, 0.7) !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
+    }
+    .modal-card {
+      background: rgba(46, 17, 32, 0.94) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+      border: 1.5px solid rgba(212, 175, 55, 0.3) !important;
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7), 0 0 80px rgba(212, 175, 55, 0.12) !important;
+    }
+
+    /* Login card */
+    .login-card-clean {
+      background: rgba(46, 17, 32, 0.6) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.7), 0 0 60px rgba(212, 175, 55, 0.1) !important;
+      border: 1px solid rgba(212, 175, 55, 0.2) !important;
+    }
+
+    /* Progress bar — gold */
+    .progress-bar {
+      background: linear-gradient(90deg, #8B6914 0%, #D4AF37 50%, #F4E4A6 100%) !important;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.7) !important;
+    }
+    .progress-bar-wrap {
+      background: rgba(212, 175, 55, 0.08) !important;
+    }
+
+    /* Badges */
+    .quiz-timer,
+    .quiz-done,
+    .assignment-status.submitted,
+    .log-success,
+    .duration-live,
+    .ip-cell {
+      background: rgba(212, 175, 55, 0.1) !important;
+      color: #D4AF37 !important;
+      border-color: rgba(212, 175, 55, 0.3) !important;
+    }
+    .assignment-status.expired,
+    .log-fail {
+      background: rgba(178, 58, 72, 0.12) !important;
+      color: #E8A0AA !important;
+      border-color: rgba(178, 58, 72, 0.35) !important;
+    }
+    .log-info {
+      background: rgba(201, 162, 39, 0.12) !important;
+      color: #C9A227 !important;
+      border-color: rgba(201, 162, 39, 0.35) !important;
+    }
+
+    .quiz-score-circle.pass {
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.22), rgba(212, 175, 55, 0.05)) !important;
+      border-color: #D4AF37 !important;
+    }
+    .quiz-score-circle.fail {
+      background: radial-gradient(circle, rgba(178, 58, 72, 0.22), rgba(178, 58, 72, 0.05)) !important;
+      border-color: #B23A48 !important;
+    }
+
+    /* Cursor ring + dot — Gold */
+    .cursor-ring {
+      border-color: rgba(212, 175, 55, 0.55) !important;
+    }
+    .cursor-ring.big {
+      border-color: #D4AF37 !important;
+      background: rgba(212, 175, 55, 0.1) !important;
+      box-shadow: 0 0 40px rgba(212, 175, 55, 0.25) !important;
+    }
+    .cursor-dot {
+      background: #D4AF37 !important;
+      box-shadow: 0 0 16px #D4AF37, 0 0 32px rgba(212, 175, 55, 0.3) !important;
+    }
+
+    /* Grain, trail — keep subtle */
+    .grain { opacity: 0.045 !important; }
+
+    * { animation-play-state: running !important; }
+
+    @media (prefers-reduced-motion: reduce) {
+      #bg .aurora, #bg .ray, #bg .vig, body::after { animation: none !important; }
+    }
+
+    /* ============================================================
+   BOOK HERO — Compact Fix + Logo Cover
+   ============================================================ */
+
+/* 1. Hero ko auto-height karo — bada empty space khatam */
+.book-hero {
+  min-height: auto !important;
+  padding: 44px 20px 56px !important;
+  margin: 20px auto 0 !important;
+}
+.book-scene {
+  height: auto !important;
+  min-height: 420px !important;
+  margin-bottom: 0 !important;
+}
+.book-hero-stats {
+  margin: -4px 0 18px !important;
+}
+.book-start-btn {
+  margin-top: 4px !important;
+}
+.book-progress-wrap {
+  margin-top: 18px !important;
+}
+
+/* 2. Book ke baad wale sections ke bade gaps chote karo */
+.book-why,
+.book-build,
+.book-start-here {
+  margin-top: 60px !important;
+}
+.curriculum-outline {
+  margin-top: 60px !important;
+}
+.book-outline-wrap {
+  margin-top: 60px !important;
+}
+
+/* 3. Book cover pe logo.png dikhane ka style */
+.cover-emblem {
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: rgba(0, 0, 0, 0.15) !important;
+}
+.cover-emblem img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8px;
+  display: block;
+  filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.55));
+}
+
+/* 4. Safety — book ko force closed state mein rakho agar open nahi kiya */
+.book-3d:not(.is-opening):not(.is-open) .book-page-spread {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+/* ============================================================
+   BOOK HERO — TIGHT SPACING FIX (Kill all the empty space)
+   ============================================================ */
+
+/* Kill decorative circles that create phantom space */
+#page-books .book-hero::before,
+#page-books .book-hero::after {
+  display: none !important;
+}
+
+/* Hero: auto height, tight padding */
+#page-books .book-hero {
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 28px 20px 44px !important;
+  margin: 16px auto 0 !important;
+}
+
+/* Book scene: shrink and remove internal margins */
+#page-books .book-scene {
+  height: 380px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+#page-books .book-scene::before {
+  display: none !important;
+}
+
+/* Reduce gap between stats and button */
+#page-books .book-hero-stats {
+  margin: 8px 0 16px !important;
+}
+#page-books .book-start-btn {
+  margin-top: 0 !important;
+}
+#page-books .book-progress-wrap {
+  margin-top: 16px !important;
+}
+
+/* Kill huge 108px gaps in section stacking */
+#page-books .book-why,
+#page-books .book-build,
+#page-books .book-start-here,
+#page-books .book-outline-wrap {
+  margin-top: 56px !important;
+}
+#page-books .curriculum-outline {
+  margin-top: 56px !important;
+}
+
+/* Book cover logo (img) styling */
+#page-books .cover-emblem {
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: rgba(0, 0, 0, 0.15) !important;
+}
+#page-books .cover-emblem img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 6px;
+  display: block;
+  filter: drop-shadow(0 0 14px rgba(212, 175, 55, 0.6));
+}
+
+/* Safety: book stays closed until clicked */
+#page-books .book-3d:not(.is-opening):not(.is-open) .book-page-spread {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ============================================================
+   BOOK MANAGER — Admin Book Editor
+   ============================================================ */
+.bm-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+  align-items: start;
+  min-height: 600px;
+}
+@media (max-width: 900px) {
+  .bm-layout { grid-template-columns: 1fr; }
+}
+
+.bm-sidebar {
+  background: rgba(46, 17, 32, 0.5);
+  border: 1.5px solid rgba(212, 175, 55, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  max-height: 720px;
+  display: flex;
+  flex-direction: column;
+}
+.bm-sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1.5px solid rgba(212, 175, 55, 0.15);
+  background: rgba(212, 175, 55, 0.04);
+}
+.bm-kicker {
+  font: 600 10px 'JetBrains Mono', monospace;
+  letter-spacing: 0.15em;
+  color: #D4AF37;
+  text-transform: uppercase;
+}
+.bm-count {
+  font: 500 10px 'JetBrains Mono', monospace;
+  color: #D4C5A8;
+  padding: 3px 8px;
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 10px;
+}
+.bm-tree {
+  padding: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+.bm-module {
+  margin-bottom: 6px;
+}
+.bm-module-head {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(212, 175, 55, 0.06);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.bm-module-head:hover {
+  border-color: rgba(212, 175, 55, 0.4);
+  background: rgba(212, 175, 55, 0.1);
+}
+.bm-module-title {
+  font: 600 12px 'Manrope', sans-serif;
+  color: #FAF3E3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bm-module-count {
+  font: 500 9px 'JetBrains Mono', monospace;
+  color: #D4C5A8;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+.bm-module-actions {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.bm-module-head:hover .bm-module-actions {
+  opacity: 1;
+}
+.bm-icon-btn {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: none;
+  color: #D4C5A8;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 12px;
+  transition: all 0.15s;
+}
+.bm-icon-btn:hover {
+  background: rgba(212, 175, 55, 0.15);
+  color: #D4AF37;
+}
+.bm-icon-btn.danger:hover {
+  background: rgba(178, 58, 72, 0.2);
+  color: #B23A48;
+}
+
+.bm-chapters {
+  padding: 4px 0 4px 12px;
+  display: none;
+}
+.bm-module.expanded .bm-chapters {
+  display: block;
+}
+.bm-chapter {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border-left: 2px solid transparent;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.bm-chapter:hover {
+  background: rgba(212, 175, 55, 0.06);
+  border-left-color: rgba(212, 175, 55, 0.4);
+}
+.bm-chapter.active {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent);
+  border-left-color: #D4AF37;
+}
+.bm-chapter-id {
+  font: 600 10px 'JetBrains Mono', monospace;
+  color: #D4AF37;
+}
+.bm-chapter-title {
+  font: 500 11.5px 'Manrope', sans-serif;
+  color: #D4C5A8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bm-editor {
+  background: rgba(46, 17, 32, 0.5);
+  border: 1.5px solid rgba(212, 175, 55, 0.2);
+  border-radius: 12px;
+  min-height: 600px;
+  padding: 26px 28px;
+}
+.bm-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 500px;
+  color: #8B7B5F;
+  text-align: center;
+}
+.bm-empty svg {
+  color: rgba(212, 175, 55, 0.3);
+}
+.bm-empty p {
+  font: 500 14px 'Manrope', sans-serif;
+  color: #D4C5A8;
+}
+.bm-empty span {
+  font: 400 12px 'Manrope', sans-serif;
+  color: #8B7B5F;
+}
+
+.bm-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1.5px solid rgba(212, 175, 55, 0.15);
+}
+.bm-form-head h3 {
+  font: 500 1.3rem 'Fraunces', serif;
+  color: #FAF3E3;
+  letter-spacing: -0.02em;
+}
+.bm-form-head-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.bm-field {
+  margin-bottom: 16px;
+}
+.bm-field label {
+  display: block;
+  font: 600 10px 'JetBrains Mono', monospace;
+  letter-spacing: 0.12em;
+  color: #D4AF37;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.bm-field input,
+.bm-field textarea {
+  width: 100%;
+  padding: 11px 14px;
+  background: rgba(26, 8, 16, 0.6) !important;
+  border: 1.5px solid rgba(212, 175, 55, 0.22) !important;
+  border-radius: 8px;
+  color: #FAF3E3;
+  font: 400 13px 'Manrope', sans-serif;
+  outline: none;
+  transition: all 0.25s;
+}
+.bm-field input:focus,
+.bm-field textarea:focus {
+  border-color: #D4AF37 !important;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12) !important;
+}
+.bm-field textarea {
+  resize: vertical;
+  min-height: 60px;
+  font-family: 'Manrope', sans-serif;
+}
+.bm-field textarea.code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  min-height: 340px;
+  line-height: 1.6;
+}
+.bm-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 700px) {
+  .bm-row { grid-template-columns: 1fr; }
+}
+.bm-hint {
+  font: 400 11px 'Manrope', sans-serif;
+  color: #8B7B5F;
+  margin-top: 5px;
+}
+.bm-preview-toggle {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 6px;
+  padding: 3px;
+  width: fit-content;
+}
+.bm-preview-toggle button {
+  background: transparent;
+  border: none;
+  padding: 6px 14px;
+  font: 600 10px 'JetBrains Mono', monospace;
+  letter-spacing: 0.08em;
+  color: #8B7B5F;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.bm-preview-toggle button.active {
+  background: rgba(212, 175, 55, 0.15);
+  color: #D4AF37;
+}
+.bm-preview {
+  border: 1.5px solid rgba(212, 175, 55, 0.15);
+  border-radius: 8px;
+  padding: 18px;
+  background: rgba(26, 8, 16, 0.4);
+  min-height: 340px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+.bm-preview .chapter-content {
+  max-width: 100%;
+  font-size: 13px;
+}
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       NEW 3D BACKGROUND — Vault (Burgundy · Gold · Cream)
+       ============================================================ -->
+  <div id="bg">
+    <div class="aurora"></div>
+    <div class="aurora b"></div>
+    <canvas id="bg-canvas"></canvas>
+    <div class="ray l"></div>
+    <div class="ray r"></div>
+    <div class="vig"></div>
+  </div>
+
+  <!-- Portal FX Layers (custom cursor + grain + trail) -->
+  <div class="grain"></div>
+  <canvas id="trail"></canvas>
+  <div class="cursor-ring" id="cring"></div>
+  <div class="cursor-dot" id="cdot"></div>
+
+  <!-- ============================================================
+       SPLASH SCREEN
+       ============================================================ -->
+  <div id="splash-screen">
+    <div class="splash-inner">
+      <div class="splash-ring"></div>
+      <div class="splash-shield">
+        <img src="./img/logo.png" alt="Cyber Knights" />
+      </div>
+      <h1 class="splash-title">Cyber <span>Knights</span></h1>
+      <p class="splash-sub">Secure Portal — Academy Edition</p>
+      <div class="splash-loader"><div class="splash-bar"></div></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       LOGIN VIEW
+       ============================================================ -->
+  <div id="login-view" class="view">
+    <div class="login-page">
+      <div class="login-brand">
+        <div class="logo-circle-sm">
+          <img src="./img/logo.png" alt="Cyber Knights" />
+        </div>
+        <h1>Cyber <span>Knights</span></h1>
+        <p class="login-tagline">Secure Portal — Academy Edition</p>
+      </div>
+
+      <div class="login-card-clean">
+        <div class="login-card-header">
+          <h2>Sign in</h2>
+          <p>Enter your credentials to continue</p>
+        </div>
+
+        <form id="login-form" autocomplete="off">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter your username" required autofocus />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="password-wrap">
+              <input type="password" id="password" placeholder="Enter your password" required />
+              <button type="button" class="toggle-pw" id="toggle-pw">◐</button>
+            </div>
+          </div>
+          <div id="error-msg" class="error-msg hidden"></div>
+          <div id="lockout-msg" class="lockout-msg hidden"></div>
+          <button type="submit" class="btn-primary" id="btn-login">Continue</button>
+        </form>
+      </div>
+
+      <div class="login-footnote">
+        <span class="dot-pulse"></span>
+        <span>Secure Portal · Password-based Authentication</span>
+      </div>
+      <div class="login-copyright">© 2026 Cyber Knights Academy</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       APP VIEW
+       ============================================================ -->
+  <div id="app-view" class="view">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="logo-mini">
+          <img src="./img/logo.png" alt="Cyber Knights" />
+          <span>Cyber Knights</span>
+        </div>
+        <nav class="main-nav" id="main-nav"></nav>
+      </div>
+      <div class="topbar-right">
+        <div class="user-menu">
+          <span id="user-display">User</span>
+          <button id="btn-profile-icon" class="icon-btn" title="My Profile">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="4"/>
+              <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>
+            </svg>
+          </button>
+          <button id="btn-logout" class="btn-logout">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- ============================================================
+           DASHBOARD
+           ============================================================ -->
+      <section id="page-dashboard" class="page active">
+        <h2>Welcome, <span id="dash-name">User</span></h2>
+        <div class="cards-grid" id="dash-cards"></div>
+        <div class="info-box">
+          <h3>Profile Information</h3>
+          <ul id="session-info" class="kv-list"></ul>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           RECORDS
+           ============================================================ -->
+      <section id="page-records" class="page">
+        <h2>Student Records</h2>
+        <p class="page-sub">School-wide student list.</p>
+        <div class="table-wrap">
+          <table class="data-table" id="records-table">
+            <thead>
+              <tr><th>ID</th><th>Name</th><th>Class</th><th>Attendance</th><th>Status</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           ASSIGNMENTS
+           ============================================================ -->
+      <section id="page-assignments" class="page">
+        <h2>Assignments</h2>
+        <p class="page-sub" id="assignments-subtitle">Current and upcoming assignments.</p>
+        <div id="assignments-admin-toolbar" class="admin-toolbar hidden">
+          <button class="btn-primary" id="btn-create-assignment">+ New Assignment</button>
+          <button class="btn-secondary" id="btn-refresh-assignments">Refresh</button>
+        </div>
+        <div class="cards-grid" id="assignments-list"></div>
+      </section>
+
+      <!-- ============================================================
+           QUIZZES
+           ============================================================ -->
+      <section id="page-quizzes" class="page">
+        <h2>Quizzes</h2>
+        <p class="page-sub" id="quizzes-subtitle">Attempt assigned quizzes.</p>
+        <div id="quizzes-admin-toolbar" class="admin-toolbar hidden">
+          <button class="btn-primary" id="btn-create-quiz">+ New Quiz</button>
+          <button class="btn-secondary" id="btn-refresh-quizzes">Refresh</button>
+        </div>
+        <div class="cards-grid" id="quizzes-list"></div>
+      </section>
+
+      <!-- ============================================================
+           EXAMS
+           ============================================================ -->
+      <section id="page-exams" class="page">
+        <h2>Exams</h2>
+        <p class="page-sub" id="exams-subtitle">Mid-term, final and other exams.</p>
+        <div id="exams-admin-toolbar" class="admin-toolbar hidden">
+          <button class="btn-primary" id="btn-create-exam">+ New Exam</button>
+          <button class="btn-secondary" id="btn-refresh-exams">Refresh</button>
+        </div>
+        <div class="cards-grid" id="exams-list"></div>
+      </section>
+
+      <!-- ============================================================
+           RESULTS
+           ============================================================ -->
+      <section id="page-results" class="page">
+        <h2>Examination Results</h2>
+        <p class="page-sub">Latest exam scores.</p>
+        <div class="table-wrap">
+          <table class="data-table" id="results-table">
+            <thead>
+              <tr><th>Student</th><th>Exam</th><th>Score</th><th>Total</th><th>Grade</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           PROGRESS
+           ============================================================ -->
+      <section id="page-progress" class="page">
+        <h2>My Progress</h2>
+        <p class="page-sub">Track your performance across assignments, quizzes and exams.</p>
+        <div id="progress-summary"></div>
+        <div class="progress-breakdown" id="progress-breakdown"></div>
+      </section>
+
+      <!-- ============================================================
+           BOOKS / LEARNING LIBRARY
+           ============================================================ -->
+      <section id="page-books" class="page">
+        <h2>Learning Library</h2>
+        <p class="page-sub">Interactive handbook for cyber security fundamentals.</p>
+
+        <!-- ============ BOOK HERO ============ -->
+        <div class="book-hero">
+
+          <!-- 3D Book -->
+          <div class="book-scene">
+            <div class="book-3d" id="book-3d">
+              <div class="book-spine"></div>
+              <div class="book-pages-stack"></div>
+              <div class="book-cover book-cover-front">
+                <div class="cover-inner">
+                  <div class="cover-grid"></div>
+                  <div class="cover-emblem">
+  <img src="./img/logo.png" alt="Cyber Knights" />
+</div>
+                  <div class="cover-title">Cyber Knights</div>
+                  <div class="cover-subtitle">Security Handbook</div>
+                  <div class="cover-divider"></div>
+                  <div class="cover-author">Academy Edition · v3.0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hero Stats -->
+          <div class="book-hero-stats" id="book-hero-stats">
+            <span><strong>63</strong> chapters</span>
+            <span class="dot">·</span>
+            <span><strong>8</strong> parts</span>
+            <span class="dot">·</span>
+            <span><strong>Free</strong> to read</span>
+          </div>
+
+          <!-- Start Learning Button -->
+          <button class="btn-primary book-start-btn" id="btn-start-learning">
+            Start Learning →
+          </button>
+
+          <!-- Progress Bar -->
+          <div class="book-progress-wrap">
+            <div class="book-progress-track">
+              <div class="book-progress-bar" id="book-progress-bar"></div>
+            </div>
+            <div class="book-progress-label" id="book-progress-label">0 / 63 chapters (0%)</div>
+          </div>
+        </div>
+
+        <!-- ============ WHY THIS BOOK ============ -->
+        <div class="book-why">
+          <div class="book-why-header">
+            <span class="book-why-tag">WHY THIS BOOK</span>
+            <h3>Written to be worked through, not skimmed.</h3>
+          </div>
+          <div class="book-why-grid">
+            <div class="book-why-card">
+              <div class="bwc-icon">⚙</div>
+              <h4>Grounded in real systems</h4>
+              <p>Every chapter opens on a concrete scenario before it defines anything. You learn not just how a tool works, but where it belongs — and when reaching for it is the wrong call.</p>
+            </div>
+            <div class="book-why-card">
+              <div class="bwc-icon">📚</div>
+              <h4>One path, in order</h4>
+              <p>Sixty-three chapters across eight parts, numbered and sequential. You always know where you are and what comes next, instead of assembling a curriculum out of disconnected tutorials.</p>
+            </div>
+            <div class="book-why-card">
+              <div class="bwc-icon">🚀</div>
+              <h4>Written for the current stack</h4>
+              <p>An entire part is given to ethical hacking and testing. The skills that separate the next decade from the last, with hands-on labs you can actually run.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ WHAT YOU BUILD ============ -->
+        <div class="book-build">
+          <div class="book-build-header">
+            <span class="book-why-tag">WHAT YOU BUILD</span>
+            <h3>Real skills, not diagrams.</h3>
+            <p>Every part ends in something executable — a config, a script, a lab you can run.</p>
+          </div>
+          <div class="book-terminal">
+            <div class="terminal-head">
+              <span class="terminal-dot red"></span>
+              <span class="terminal-dot yellow"></span>
+              <span class="terminal-dot green"></span>
+              <span class="terminal-title">~/cyber-knights</span>
+            </div>
+            <div class="terminal-body">
+              <div class="terminal-line">
+                <span class="term-prompt">$</span>
+                <span class="term-cmd">python hash_password.py --algo argon2id</span>
+              </div>
+              <div class="terminal-out">
+                <span class="term-ok">✓</span> Password hashed with Argon2id (cost=3, mem=64MB)
+              </div>
+              <div class="terminal-line">
+                <span class="term-prompt">$</span>
+                <span class="term-cmd">nmap -sV -A lab-target.local</span>
+              </div>
+              <div class="terminal-out">
+                <span class="term-ok">✓</span> 5 open ports · 2 services vulnerable
+              </div>
+              <div class="terminal-line">
+                <span class="term-prompt">$</span>
+                <span class="term-cmd">zap-cli quick-scan http://portal.local</span>
+              </div>
+              <div class="terminal-out">
+                <span class="term-ok">✓</span> 0 critical · 2 medium · 5 low findings
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ START HERE ============ -->
+        <div class="book-start-here">
+          <div class="bsh-left">
+            <span class="book-why-tag">START HERE</span>
+            <h3>The first chapter is already written.</h3>
+            <p>Chapter 0.1 — <strong>What is Cyber Security?</strong> — is published and free to read today. New parts land as they are finished.</p>
+          </div>
+          <button class="btn-primary book-start-btn-inline" id="btn-start-learning-2">
+            Open the Book →
+          </button>
+        </div>
+
+        <!-- ============ COMPLETE CURRICULUM OUTLINE ============ -->
+        <div class="curriculum-outline">
+          <div class="curriculum-header">
+            <span class="book-why-tag">THE COMPLETE CURRICULUM</span>
+            <h3>Eight modules. Forty-six chapters. One path.</h3>
+            <p>
+              Every module builds on the last. Start at Chapter 0.1 — or jump
+              to any chapter that calls to you. Reading progress is saved automatically.
+            </p>
+          </div>
+
+          <div class="curriculum-timeline">
+
+            <!-- FRONT MATTER -->
+            <div class="curr-module is-front" data-module="front">
+              <div class="curr-module-marker">
+                <span class="curr-marker-num">FM</span>
+                <span class="curr-marker-line"></span>
+              </div>
+              <div class="curr-module-body">
+                <div class="curr-module-head">
+                  <div class="curr-module-icon">📖</div>
+                  <div class="curr-module-info">
+                    <span class="curr-module-kicker">Before You Begin</span>
+                    <h4>Front Matter</h4>
+                  </div>
+                  <span class="curr-module-count">3 chapters</span>
+                </div>
+                <p class="curr-module-desc">
+                  How this handbook is structured, how to navigate it, and the ethics
+                  that govern every lab you'll run.
+                </p>
+                <ul class="curr-chapter-list">
+                  <li><span class="curr-ch-num">FM.1</span> Preface</li>
+                  <li><span class="curr-ch-num">FM.2</span> How to Use This Book</li>
+                  <li><span class="curr-ch-num">FM.3</span> Lab Safety, Ethics & Legal Boundaries</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- MODULE 0 -->
+            <div class="curr-module" data-module="m0">
+              <div class="curr-module-marker">
+                <span class="curr-marker-num">00</span>
+                <span class="curr-marker-line"></span>
+              </div>
+              <div class="curr-module-body">
+                <div class="curr-module-head">
+                  <div class="curr-module-icon">🧠</div>
+                  <div class="curr-module-info">
+                    <span class="curr-module-kicker">Module 00</span>
+                    <h4>Orientation & Foundations</h4>
+                  </div>
+                  <span class="curr-module-count">3 chapters</span>
+                </div>
+                <p class="curr-module-desc">
+                  Before you touch a single tool, learn what cyber security actually is,
+                  how attackers and defenders think, and where the ethical line sits.
+                </p>
+                <ul class="curr-chapter-list">
+                  <li><span class="curr-ch-num">0.1</span> Cyber Security Fundamentals & The CIA Triad</li>
+                  <li><span class="curr-ch-num">0.2</span> Hacker Mindset, Ethics & Legal Boundaries</li>
+                  <li><span class="curr-ch-num">0.3</span> Lab Setup & Career Roadmap</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- MODULE 1 -->
+            <div class="curr-module" data-module="m1">
+              <div class="curr-module-marker">
+                <span class="curr-marker-num">01</span>
+                <span class="curr-marker-line"></span>
+              </div>
+              <div class="curr-module-body">
+                <div class="curr-module-head">
+                  <div class="curr-module-icon">🌐</div>
+                  <div class="curr-module-info">
+                    <span class="curr-module-kicker">Module 01</span>
+                    <h4>Networking Deep Foundations</h4>
+                  </div>
+                  <span class="curr-module-count">14 chapters</span>
+                </div>
+                <p class="curr-module-desc">
+                  You cannot defend a network you do not understand. Build layer-by-layer
+                  knowledge of how data moves — and where each layer can be attacked.
+                </p>
+                <ul class="curr-chapter-list">
+                  <li><span class="curr-ch-num">1.1</span> What is a Network? — PAN, LAN, MAN, WAN</li>
+                  <li><span class="curr-ch-num">1.2</span> The Role of an ISP</li>
+                  <li><span class="curr-ch-num">1.3</span> Network Topologies</li>
+                  <li><span class="curr-ch-num">1.4</span> The OSI Model & TCP/IP Stack</li>
+                  <li><span class="curr-ch-num">1.5</span> Data Packets & The TCP 3-Way Handshake</li>
+                  <li><span class="curr-ch-num">1.6</span> MAC Addresses</li>
+                  <li><span class="curr-ch-num">1.7</span> IP Addresses (IPv4 / IPv6)</li>
+                  <li><span class="curr-ch-num">1.8</span> ARP — Address Resolution Protocol</li>
+                  <li><span class="curr-ch-num">1.9</span> DHCP — Dynamic Host Configuration Protocol</li>
+                  <li><span class="curr-ch-num">1.10</span> DNS — Domain Name System</li>
+                  <li><span class="curr-ch-num">1.11</span> Ports & Protocols</li>
+                  <li><span class="curr-ch-num">1.12</span> HTTP & HTTPS</li>
+                  <li><span class="curr-ch-num">1.13</span> Subnetting & NAT</li>
+                  <li><span class="curr-ch-num">1.14</span> VPN & Firewall</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- MODULE 2 -->
+            <div class="curr-module" data-module="m2">
+              <div class="curr-module-marker">
+                <span class="curr-marker-num">02</span>
+                <span class="curr-marker-line"></span>
+              </div>
+              <div class="curr-module-body">
+                <div class="curr-module-head">
+                  <div class="curr-module-icon">🔐</div>
+                  <div class="curr-module-info">
+                    <span class="curr-module-kicker">Module 02</span>
+                    <h4>Security & Cryptography</h4>
+                  </div>
+                  <span class="curr-module-count">5 chapters</span>
+                </div>
+                <p class="curr-module-desc">
+                  Cryptography is the mathematics of trust. Learn how we keep secrets
+                  secret, verify integrity, and prove identity.
+                </p>
+                <ul class="curr-chapter-list">
+                  <li><span class="curr-ch-num">2.1</span> CIA Triad Applied & Encryption Fundamentals</li>
+                  <li><span class="curr-ch-num">2.2</span> Symmetric vs Asymmetric Encryption (AES & RSA)</li>
+                  <li><span class="curr-ch-num">2.3</span> Hashing, Salting, Peppering & Password Security</li>
+                  <li><span class="curr-ch-num">2.4</span> 2FA / MFA, IAM & Zero Trust</li>
+                  <li><span class="curr-ch-num">2.5</span> PKI, Digital Signatures & Certificates</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- MODULE 3 -->
+            <div class="curr-module" data-module="m3">
+              <div class="curr-module-marker">
+                <span class="curr-marker-num">03</span>
+                <span class="curr-marker-line"></span>
+              </div>
+              <div class="curr-module-body">
+                <div class="curr-module-head">
+                  <div class="curr-module-icon">☣️</div>
+                  <div class="curr-module-info">
+                    <span class="curr-module-kicker">Module 03</span>
+                    <h4>Malware & Threat Types</h4>
+                  </div>
+                  <span class="curr-module-count">5 chapters</span>
+                </div>
+                <p class="curr-module-desc">
+                  Malware is the attacker's tool of the trade. Catalog each family —
+                  how they spread, what they do, and how defenders spot them.
+                </p>
+                <ul class="curr-chapter-list">
+                  <li><span class="curr-ch-num">3.1</span> Virus, Worm & Trojan Horse</li>
+                  <li><span class="curr-ch-num">3.2</span> Ransomware, Spyware & Adware</li>
+                  <li><span class="curr-ch-num">3.3</span> Rootkit, Keylogger & Botnet</li>
+                  <li><span class="curr-ch-num">3.4</span> Session Hijacking</li>
+                  <li><span class="curr-ch-num">3.5</span> Malware Analysis in a Safe Lab</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- MODULE 4 -->
+            <div class="curr-module" data-module="m4">
+              <div class="curr-module-marker">
+                <span class="curr-marker-num">04</span>
+                <span class="curr-marker-line"></span>
+              </div>
+              <div class="curr-module-body">
+                <div class="curr-module-head">
+                  <div class="curr-module-icon">⚔️</div>
+                  <div class="curr-module-info">
+                    <span class="curr-module-kicker">Module 04 · Safe Lab Only</span>
+                    <h4>Attack Techniques</h4>
+                  </div>
+                  <span class="curr-module-count">10 chapters</span>
+                </div>
+                <p class="curr-module-desc">
+                  To defend like a professional, think like an attacker. Every technique
+                  here is performed only in isolated, owned labs.
+                </p>
+                <ul class="curr-chapter-list">
+                  <li><span class="curr-ch-num">4.1</span> SQL Injection</li>
+                  <li><span class="curr-ch-num">4.2</span> Cross-Site Scripting (XSS)</li>
+                  <li><span class="curr-ch-num">4.3</span> Distributed Denial of Service (DDoS)</li>
+                  <li><span class="curr-ch-num">4.4</span> MITM, ARP Spoofing & DNS Spoofing</li>
+                  <li><span class="curr-ch-num">4.5</span> Port Scanning & Nmap Fundamentals</li>
+                  <li><span class="curr-ch-num">4.6</span> Device & IoT Hacking — A Defensive View</li>
+                  <li><span class="curr-ch-num">4.7</span> The Dark Web & OSINT</li>
+                  <li><span class="curr-ch-num">4.8</span> Phishing, Spear Phishing & Whaling</li>
+                  <li><span class="curr-ch-num">4.9</span> Social Engineering</li>
+                  <li><span class="curr-ch-num">4.10</span> Brute Force & Dictionary Attacks</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- MODULE 5 -->
+            <div class="curr-module" data-module="m5">
+              <div class="curr-module-marker">
+                <span class="curr-marker-num">05</span>
+                <span class="curr-marker-line"></span>
+              </div>
+              <div class="curr-module-body">
+                <div class="curr-module-head">
+                  <div class="curr-module-icon">🛡️</div>
+                  <div class="curr-module-info">
+                    <span class="curr-module-kicker">Module 05</span>
+                    <h4>Defense, Detection & Response</h4>
+                  </div>
+                  <span class="curr-module-count">4 chapters</span>
+                </div>
+                <p class="curr-module-desc">
+                  The defender's playbook. Spot threats before they hit, secure the
+                  systems that hold your data, and respond when something goes wrong.
+                </p>
+                <ul class="curr-chapter-list">
+                  <li><span class="curr-ch-num">5.1</span> Threat Detection & Threat Hunting</li>
+                  <li><span class="curr-ch-num">5.2</span> Securing Systems & Data</li>
+                  <li><span class="curr-ch-num">5.3</span> Monitoring, SOC & SIEM</li>
+                  <li><span class="curr-ch-num">5.4</span> Incident Response Lifecycle</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- MODULE 6 -->
+            <div class="curr-module" data-module="m6">
+              <div class="curr-module-marker">
+                <span class="curr-marker-num">06</span>
+                <span class="curr-marker-line"></span>
+              </div>
+              <div class="curr-module-body">
+                <div class="curr-module-head">
+                  <div class="curr-module-icon">🧰</div>
+                  <div class="curr-module-info">
+                    <span class="curr-module-kicker">Module 06</span>
+                    <h4>Tools of the Trade</h4>
+                  </div>
+                  <span class="curr-module-count">3 chapters</span>
+                </div>
+                <p class="curr-module-desc">
+                  A practitioner's toolkit. Each chapter introduces one tool — what it
+                  does, when to use it, and how to read its output safely.
+                </p>
+                <ul class="curr-chapter-list">
+                  <li><span class="curr-ch-num">6.1</span> Nmap</li>
+                  <li><span class="curr-ch-num">6.2</span> Wireshark</li>
+                  <li><span class="curr-ch-num">6.3</span> VirusTotal, HxD, Google Dorks, Wappalyzer, HIBP & CLI</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- MODULE 7 -->
+            <div class="curr-module" data-module="m7">
+              <div class="curr-module-marker">
+                <span class="curr-marker-num">07</span>
+                <span class="curr-marker-line"></span>
+              </div>
+              <div class="curr-module-body">
+                <div class="curr-module-head">
+                  <div class="curr-module-icon">🎯</div>
+                  <div class="curr-module-info">
+                    <span class="curr-module-kicker">Module 07</span>
+                    <h4>Capstone Projects & Career</h4>
+                  </div>
+                  <span class="curr-module-count">2 chapters</span>
+                </div>
+                <p class="curr-module-desc">
+                  Everything you've learned, put to work. These projects prove your
+                  skills to employers — and to yourself.
+                </p>
+                <ul class="curr-chapter-list">
+                  <li><span class="curr-ch-num">7.1</span> Home Lab Capstone Projects</li>
+                  <li><span class="curr-ch-num">7.2</span> Career Paths & Next Steps</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- CURRICULUM STATS -->
+          <div class="curriculum-stats">
+            <div class="curr-stat">
+              <span class="curr-stat-num">49</span>
+              <span class="curr-stat-label">Chapters</span>
+            </div>
+            <div class="curr-stat">
+              <span class="curr-stat-num">8</span>
+              <span class="curr-stat-label">Modules</span>
+            </div>
+            <div class="curr-stat">
+              <span class="curr-stat-num">~650</span>
+              <span class="curr-stat-label">Pages</span>
+            </div>
+            <div class="curr-stat">
+              <span class="curr-stat-num">100%</span>
+              <span class="curr-stat-label">Free Access</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ OUTLINE + CONTENT ============ -->
+        <div id="book-outline-wrap" class="book-outline-wrap hidden">
+          <div class="book-layout">
+
+            <!-- Sidebar -->
+            <aside class="book-sidebar">
+              <div class="book-sidebar-header">
+                <h3>Book Path</h3>
+                <button class="mini-btn" id="btn-close-book">Close Book</button>
+              </div>
+              <div id="book-outline-list" class="outline-list"></div>
+            </aside>
+
+            <!-- Content -->
+            <div class="book-content-panel">
+              <div id="book-content" class="book-content"></div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           PROFILE
+           ============================================================ -->
+      <section id="page-profile" class="page">
+        <h2>My Profile</h2>
+        <p class="page-sub">View and update your account information.</p>
+        <div class="section-block">
+          <div class="section-block-head">
+            <h3>Account Details</h3>
+            <span class="section-tag">Editable</span>
+          </div>
+          <form id="profile-form" class="profile-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="pf-username">Username</label>
+                <input type="text" id="pf-username" disabled />
+              </div>
+              <div class="form-group">
+                <label for="pf-display-name">Full Name</label>
+                <input type="text" id="pf-display-name" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="pf-email">Email</label>
+                <input type="email" id="pf-email" />
+              </div>
+              <div class="form-group">
+                <label for="pf-mobile">Mobile</label>
+                <input type="text" id="pf-mobile" />
+              </div>
+            </div>
+            <div class="section-divider"></div>
+            <div class="form-group">
+              <label for="pf-password">New Password <span class="hint">(leave blank to keep current)</span></label>
+              <input type="password" id="pf-password" placeholder="Min 6 characters" />
+            </div>
+            <div id="profile-msg" class="error-msg hidden"></div>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           ADMIN PANEL
+           ============================================================ -->
+      <section id="page-admin" class="page">
+        <h2>Administrator Panel</h2>
+        <p class="page-sub">Full control over users, sessions and system.</p>
+
+        <div class="admin-tabs">
+          <button class="admin-tab active" data-tab="overview">Overview</button>
+          <button class="admin-tab" data-tab="users">Users</button>
+          <button class="admin-tab" data-tab="sessions">Active Sessions</button>
+          <button class="admin-tab" data-tab="books">Book Manager</button>
+        </div>
+
+        <div id="admin-tab-overview" class="admin-tab-content active">
+          <div class="cards-grid" id="admin-stats"></div>
+        </div>
+
+        <div id="admin-tab-users" class="admin-tab-content">
+  <div class="admin-toolbar">
+    <button class="btn-primary" id="btn-add-user">+ New User</button>
+    <button class="btn-secondary" id="btn-refresh-users">Refresh</button>
+  </div>
+          <div class="table-wrap">
+            <table class="data-table" id="users-table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Class</th>
+                  <th>Email</th>
+                  <th>Last Login</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="admin-tab-sessions" class="admin-tab-content">
+          <div class="admin-toolbar">
+            <button class="btn-secondary" id="btn-refresh-sessions">Refresh</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="sessions-table">
+              <thead>
+                <tr>
+                  <th>User</th><th>Role</th><th>IP</th><th>Mode</th>
+                  <th>Login Time</th><th>Last Seen</th><th>Duration</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="admin-tab-books" class="admin-tab-content">
+  <div class="admin-toolbar">
+    <button class="btn-primary" id="bm-add-module">+ New Module</button>
+    <button class="btn-secondary" id="bm-export">Export JSON</button>
+    <button class="btn-secondary" id="bm-import">Import JSON</button>
+    <button class="btn-secondary" id="bm-reset">Reset to Default</button>
+  </div>
+
+  <div class="bm-layout">
+    <!-- Left: Module/Chapter Tree -->
+    <aside class="bm-sidebar">
+      <div class="bm-sidebar-head">
+        <span class="bm-kicker">Structure</span>
+        <span class="bm-count" id="bm-count">0 chapters</span>
+      </div>
+      <div class="bm-tree" id="bm-tree"></div>
+    </aside>
+
+    <!-- Right: Editor -->
+    <main class="bm-editor" id="bm-editor">
+      <div class="bm-empty">
+        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M4 4h16v16H4z M4 9h16 M8 4v16"/>
+        </svg>
+        <p>Select a chapter from the tree to edit it</p>
+        <span>Or create a new module to begin</span>
+      </div>
+    </main>
+  </div>
+</div>
+      </section>
+
+      <!-- ============================================================
+           STUDENTS (Teacher + Admin)
+           ============================================================ -->
+      <section id="page-students" class="page">
+        <h2>Manage Students</h2>
+        <p class="page-sub">View and edit student information.</p>
+        <div class="table-wrap">
+          <table class="data-table" id="teacher-students-table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Course</th>
+                <th>Email</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           LOGS
+           ============================================================ -->
+      <section id="page-logs" class="page">
+        <h2>Authentication Monitoring</h2>
+        <p class="page-sub">Security-relevant events recorded in real-time.</p>
+        <div class="logs-toolbar">
+          <button class="btn-secondary" id="btn-clear-logs">Clear Logs</button>
+          <button class="btn-secondary" id="btn-export-logs">Export JSON</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="logs-table">
+            <thead>
+              <tr>
+                <th>Time</th><th>User</th><th>Role</th><th>Action</th>
+                <th>Factor</th><th>IP Address</th><th>Result</th><th>Details</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           TEST MATRIX
+           ============================================================ -->
+      <section id="page-matrix" class="page">
+        <h2>Identity Security Test Matrix</h2>
+        <p class="page-sub">Mandatory test cases from the SRS.</p>
+        <div class="table-wrap">
+          <table class="data-table" id="matrix-table">
+            <thead>
+              <tr>
+                <th>Test ID</th><th>User/Role</th><th>Test Action</th>
+                <th>Expected Result</th><th>Actual</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ============================================================
+       MODALS
+       ============================================================ -->
+
+  <!-- CREATE USER MODAL -->
+<div id="create-user-modal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>Create New User</h3>
+      <button class="modal-close" data-close-modal="create-user-modal">×</button>
+    </div>
+    <form id="create-user-form" class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cu-username">Username *</label>
+          <input type="text" id="cu-username" required autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label for="cu-display">Full Name *</label>
+          <input type="text" id="cu-display" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cu-email">Email</label>
+          <input type="email" id="cu-email" />
+        </div>
+        <div class="form-group">
+          <label for="cu-mobile">Mobile</label>
+          <input type="text" id="cu-mobile" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cu-role">Role *</label>
+          <select id="cu-role" required>
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="cu-course">Course <span class="hint">(students only)</span></label>
+          <input type="text" id="cu-course" placeholder="e.g., Cybersecurity Fundamentals" />
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:16px;">
+        <label for="cu-password">Password * <span class="hint">(min 6 chars)</span></label>
+        <input type="password" id="cu-password" required minlength="6" />
+      </div>
+      <div id="create-user-msg" class="error-msg hidden"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" data-close-modal="create-user-modal">Cancel</button>
+        <button type="submit" class="btn-primary">Create User</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <!-- EDIT USER MODAL -->
+  <div id="edit-user-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Edit User</h3>
+        <button class="modal-close" data-close-modal="edit-user-modal">×</button>
+      </div>
+      <form id="edit-user-form" class="modal-body">
+        <input type="hidden" id="eu-id" />
+        <div class="form-row">
+          <div class="form-group">
+            <label for="eu-username">Username</label>
+            <input type="text" id="eu-username" disabled />
+          </div>
+          <div class="form-group">
+            <label for="eu-display">Full Name</label>
+            <input type="text" id="eu-display" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="eu-email">Email</label>
+            <input type="email" id="eu-email" />
+          </div>
+          <div class="form-group">
+            <label for="eu-mobile">Mobile</label>
+            <input type="text" id="eu-mobile" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="eu-role">Role</label>
+            <select id="eu-role">
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="eu-class">Class</label>
+            <input type="text" id="eu-class" placeholder="For students only" />
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:16px;">
+          <label for="eu-password">New Password <span class="hint">(leave blank to keep current)</span></label>
+          <input type="password" id="eu-password" placeholder="Min 6 characters" />
+        </div>
+        <div id="edit-user-msg" class="error-msg hidden"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close-modal="edit-user-modal">Cancel</button>
+          <button type="submit" class="btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CREATE ASSIGNMENT MODAL -->
+  <div id="assignment-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>New Assignment</h3>
+        <button class="modal-close" data-close-modal="assignment-modal">×</button>
+      </div>
+      <form id="assignment-form" class="modal-body">
+        <input type="hidden" id="as-id" />
+        <div class="form-group">
+          <label for="as-title">Title</label>
+          <input type="text" id="as-title" required />
+        </div>
+        <div class="form-group">
+          <label for="as-desc">Description</label>
+          <textarea id="as-desc" rows="3"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="as-marks">Total Marks</label>
+            <input type="number" id="as-marks" value="10" min="1" />
+          </div>
+          <div class="form-group">
+            <label for="as-deadline">Deadline</label>
+            <input type="datetime-local" id="as-deadline" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Assign To (students)</label>
+          <div id="as-students-list" class="student-checkbox-list"></div>
+        </div>
+        <div id="assignment-msg" class="error-msg hidden"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close-modal="assignment-modal">Cancel</button>
+          <button type="submit" class="btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CREATE QUIZ MODAL -->
+  <div id="quiz-modal" class="modal-overlay hidden">
+    <div class="modal-card modal-card-lg">
+      <div class="modal-head">
+        <h3>New Quiz</h3>
+        <button class="modal-close" data-close-modal="quiz-modal">×</button>
+      </div>
+      <form id="quiz-form" class="modal-body">
+        <input type="hidden" id="q-id" />
+        <div class="form-row">
+          <div class="form-group">
+            <label for="q-title">Quiz Title</label>
+            <input type="text" id="q-title" required />
+          </div>
+          <div class="form-group">
+            <label for="q-duration">Duration (minutes)</label>
+            <input type="number" id="q-duration" value="15" min="1" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="q-desc">Description</label>
+          <textarea id="q-desc" rows="2"></textarea>
+        </div>
+
+        <div class="section-divider"></div>
+        <div class="form-row">
+          <h4 class="modal-subtitle">Questions</h4>
+          <button type="button" class="btn-secondary" id="btn-add-question" style="width:auto;padding:8px 14px;font-size:12px;">+ Add Question</button>
+        </div>
+        <div id="quiz-questions-wrap"></div>
+
+        <div class="form-group" style="margin-top:20px;">
+          <label>Assign To (students)</label>
+          <div id="q-students-list" class="student-checkbox-list"></div>
+        </div>
+
+        <div id="quiz-msg" class="error-msg hidden"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close-modal="quiz-modal">Cancel</button>
+          <button type="submit" class="btn-primary">Save Quiz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- QUIZ ATTEMPT MODAL -->
+  <div id="quiz-attempt-modal" class="modal-overlay hidden">
+    <div class="modal-card modal-card-lg">
+      <div class="modal-head">
+        <h3 id="quiz-attempt-title">Quiz</h3>
+        <span class="quiz-timer" id="quiz-attempt-timer">15:00</span>
+      </div>
+      <div class="modal-body" id="quiz-attempt-body">
+        <div id="quiz-attempt-questions"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" id="btn-quiz-submit">Submit Answers</button>
+        </div>
+      </div>
+      <div class="modal-body hidden" id="quiz-review-body">
+        <div class="quiz-review-banner">
+          <h3>Review your answers before submitting</h3>
+          <p>Once you finalize, you cannot attempt this quiz again.</p>
+        </div>
+        <div id="quiz-review-list"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="btn-quiz-back">Back to Edit</button>
+          <button type="button" class="btn-primary" id="btn-quiz-finalize">Finalize &amp; Submit</button>
+        </div>
+      </div>
+      <div class="modal-body hidden" id="quiz-result-body">
+        <div class="quiz-result-hero" id="quiz-result-hero"></div>
+        <div id="quiz-result-detail"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" data-close-modal="quiz-attempt-modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASSIGNMENT SUBMIT MODAL -->
+  <div id="assignment-submit-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Submit Assignment</h3>
+        <button class="modal-close" data-close-modal="assignment-submit-modal">×</button>
+      </div>
+      <form id="assignment-submit-form" class="modal-body">
+        <input type="hidden" id="asub-id" />
+        <div class="form-group">
+          <label>Your Answer / Submission</label>
+          <textarea id="asub-content" rows="6" placeholder="Write your answer here..." required></textarea>
+        </div>
+        <div id="asub-msg" class="error-msg hidden"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close-modal="assignment-submit-modal">Cancel</button>
+          <button type="submit" class="btn-primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CREATE EXAM MODAL -->
+  <div id="exam-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>New Exam</h3>
+        <button class="modal-close" data-close-modal="exam-modal">×</button>
+      </div>
+      <form id="exam-form" class="modal-body">
+        <div class="form-group">
+          <label for="ex-title">Exam Title</label>
+          <input type="text" id="ex-title" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ex-type">Type</label>
+            <select id="ex-type">
+              <option value="midterm">Mid-term</option>
+              <option value="final">Final</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ex-marks">Total Marks</label>
+            <input type="number" id="ex-marks" value="100" min="1" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ex-date">Exam Date</label>
+            <input type="date" id="ex-date" />
+          </div>
+          <div class="form-group">
+            <label for="ex-duration">Duration (minutes)</label>
+            <input type="number" id="ex-duration" value="60" min="1" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Assign To (students)</label>
+          <div id="ex-students-list" class="student-checkbox-list"></div>
+        </div>
+        <div id="exam-msg" class="error-msg hidden"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close-modal="exam-modal">Cancel</button>
+          <button type="submit" class="btn-primary">Save Exam</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- ============================================================
+       SCRIPTS (Order matters!)
+       ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+<!-- App modules -->
+<script src="./js/supabase-client.js"></script>
+<script src="./js/auth.js"></script>
+<script src="./js/books.js"></script>          <!-- BOOK defined here -->
+<script src="./js/app.js"></script>
+<script src="./js/user-management.js"></script>
+<script src="./js/data-sync.js"></script>
+<script src="./js/book-admin.js"></script>  
+
+  <!-- ============================================================
+       NEW 3D VAULT BACKGROUND — Three.js (r160)
+       ============================================================ -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
+  <script>
+  (()=>{
+    if(!window.THREE){console.warn('Three.js not loaded — bg disabled');return;}
+    const mobile=matchMedia('(max-width:768px)').matches||/Mobi|Android/i.test(navigator.userAgent);
+    const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
+    THREE.ColorManagement.enabled=false;
+    const MAX=mobile?500:1500;
+    const S={count:mobile?450:1200,speed:reduced?.08:1,bloom:1,grid:1};
+    const canvas=document.getElementById('bg-canvas');
+    let renderer;
+    try{renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:!mobile,powerPreference:'high-performance'});}
+    catch(e){return;}
+    renderer.outputColorSpace=THREE.LinearSRGBColorSpace;
+    let dpr=Math.min(devicePixelRatio,mobile?1.5:2);
+    renderer.setPixelRatio(dpr);
+    const scene=new THREE.Scene();
+    const cam=new THREE.PerspectiveCamera(55,1,.1,200);cam.position.set(0,0,14);
+    const rnd=(a,b)=>a+Math.random()*(b-a);
+    const GOLD=new THREE.Color('#D4AF37'),WINE=new THREE.Color('#B23A48'),AMBER=new THREE.Color('#C9A227'),GLOW=new THREE.Color('#F4E4A6');
+    const ADD=THREE.AdditiveBlending;
+
+    /* L2: golden particle field */
+    const pg=new THREE.BufferGeometry();
+    const pos=new Float32Array(MAX*3),rr=new Float32Array(MAX*4);
+    for(let i=0;i<MAX;i++){pos.set([rnd(-34,34),rnd(-16,16),rnd(-18,8)],i*3);rr.set([Math.random(),Math.random(),Math.random(),Math.random()],i*4);}
+    pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    pg.setAttribute('aR',new THREE.BufferAttribute(rr,4));
+    pg.setDrawRange(0,S.count);
+    const pu={uT:{value:0},uPx:{value:2.4},uBloom:{value:1},uPulse:{value:-1}};
+    const pMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:ADD,uniforms:pu,
+      vertexShader:`uniform float uT,uPx,uBloom,uPulse;attribute vec4 aR;varying float vA;
+      void main(){
+        vec3 p=position;
+        p.y=mod(position.y+uT*(.25+aR.z*.35)+16.,32.)-16.;
+        p.x+=sin(uT*.4+aR.y*6.28)*.6;p.z+=cos(uT*.3+aR.y*6.28)*.5;
+        vec4 mv=modelViewMatrix*vec4(p,1.);
+        float tw=pow(max(0.,sin(uT*(.6+aR.w)+aR.y*40.)),24.);
+        float ring=exp(-pow((length(p.xy)-uPulse*34.)*.35,2.))*step(0.,uPulse);
+        float edge=1.-smoothstep(12.,16.,abs(p.y));
+        vA=((.35+.4*aR.x)*(.5+.5*smoothstep(-18.,6.,p.z))+tw*.9+ring*.8)*edge;
+        gl_PointSize=uPx*(1.+aR.x*2.+tw*2.5+ring*1.5)*(.6+.4*uBloom)*(14./max(-mv.z,4.));
+        gl_Position=projectionMatrix*mv;}`,
+      fragmentShader:`uniform float uBloom;varying float vA;
+      void main(){float d=length(gl_PointCoord-.5)*2.;if(d>1.)discard;float c=1.-d;
+        vec3 col=mix(vec3(.83,.69,.22),vec3(.96,.89,.65),smoothstep(.5,1.,vA));
+        gl_FragColor=vec4(col,vA*(c*c*.6*uBloom+pow(c,10.)));}`});
+    const particles=new THREE.Points(pg,pMat);particles.frustumCulled=false;scene.add(particles);
+
+    /* L3: wireframe shield */
+    const sh=new THREE.Shape();
+    sh.moveTo(-2.3,3);sh.lineTo(2.3,3);sh.lineTo(2.3,.2);
+    sh.quadraticCurveTo(2.3,-1.9,0,-3);sh.quadraticCurveTo(-2.3,-1.9,-2.3,.2);sh.closePath();
+    const outline=sh.getPoints(8),seg=[],Z=.28;
+    const ring=(pts,z,s)=>{for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];seg.push(a.x*s,a.y*s,z,b.x*s,b.y*s,z);}};
+    [1,.8].forEach(s=>{ring(outline,Z,s);ring(outline,-Z,s);});
+    outline.forEach((p,i)=>{
+      if(i%3===0)seg.push(p.x,p.y,Z,p.x,p.y,-Z);
+      if(i%2===0)[Z,-Z].forEach(z=>seg.push(p.x,p.y,z,p.x*.8,p.y*.8,z));
+    });
+    const kh=[];for(let i=0;i<20;i++){const a=i/20*Math.PI*2;kh.push(new THREE.Vector2(Math.cos(a)*.5,.3+Math.sin(a)*.5));}
+    [Z,-Z].forEach(z=>{
+      seg.push(0,2.4,z,0,-2.4,z,-1.84,1.9,z,1.84,1.9,z);
+      seg.push(-.14,-.15,z,-.3,-1.4,z,.14,-.15,z,.3,-1.4,z,-.3,-1.4,z,.3,-1.4,z);
+    });
+    ring(kh,Z,1);ring(kh,-Z,1);
+    const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.Float32BufferAttribute(seg,3));
+    const sMatL=new THREE.LineBasicMaterial({color:GOLD,transparent:true,opacity:.8,blending:ADD,depthWrite:false});
+    const shield=new THREE.LineSegments(sg,sMatL);shield.frustumCulled=false;scene.add(shield);
+
+    const gMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:ADD,uniforms:{uG:{value:.1}},
+      vertexShader:`varying vec2 vU;void main(){vU=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+      fragmentShader:`uniform float uG;varying vec2 vU;void main(){float d=length(vU-.5)*2.;gl_FragColor=vec4(.83,.69,.22,pow(max(1.-d,0.),2.5)*uG);}`});
+    const glowPlane=new THREE.Mesh(new THREE.PlaneGeometry(16,16),gMat);glowPlane.position.z=-1.5;scene.add(glowPlane);
+
+    /* L4: data streams */
+    const N=mobile?6:9,P=mobile?6:10,curves=[],lineMats=[],spd=[];
+    for(let i=0;i<N;i++){
+      const a=i/N*Math.PI*2+rnd(-.2,.2),sx=Math.cos(a),sy=Math.sin(a)*.6,z0=rnd(-12,-4);
+      const c=new THREE.CatmullRomCurve3([
+        new THREE.Vector3(sx*30,sy*20,z0),new THREE.Vector3(sx*19-sy*4,sy*13+sx*4,z0+2),
+        new THREE.Vector3(sx*10+sy*3,sy*7-sx*3,z0+4),new THREE.Vector3(sx*2.6,sy*1.6,-2)]);
+      const m=new THREE.LineBasicMaterial({color:GOLD,transparent:true,opacity:.15,blending:ADD,depthWrite:false});
+      const l=new THREE.Line(new THREE.BufferGeometry().setFromPoints(c.getPoints(80)),m);l.frustumCulled=false;
+      scene.add(l);curves.push(c);lineMats.push(m);spd.push(rnd(.03,.06));
+    }
+    const pk=new THREE.BufferGeometry(),pkPos=new Float32Array(N*P*3),pkA=new Float32Array(N*P),pkC=new Float32Array(N*P*3);
+    for(let i=0;i<N*P;i++){(Math.random()<.15?WINE:Math.random()<.5?GLOW:AMBER).toArray(pkC,i*3);}
+    pk.setAttribute('position',new THREE.BufferAttribute(pkPos,3));
+    pk.setAttribute('aA',new THREE.BufferAttribute(pkA,1));
+    pk.setAttribute('aC',new THREE.BufferAttribute(pkC,3));
+    const kMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:ADD,uniforms:{uPx:{value:dpr}},
+      vertexShader:`attribute vec3 aC;attribute float aA;uniform float uPx;varying vec3 vC;varying float vA;
+      void main(){vC=aC;vA=aA;vec4 m=modelViewMatrix*vec4(position,1.);gl_PointSize=uPx*7.*(14./max(-m.z,4.));gl_Position=projectionMatrix*m;}`,
+      fragmentShader:`varying vec3 vC;varying float vA;void main(){float d=length(gl_PointCoord-.5)*2.;if(d>1.)discard;float c=1.-d;gl_FragColor=vec4(vC,vA*(c*c*.5+pow(c,6.)));}`});
+    const packets=new THREE.Points(pk,kMat);packets.frustumCulled=false;scene.add(packets);
+    const tmp=new THREE.Vector3();
+
+    /* L5: grid floor */
+    const gp=[];
+    for(let z=-90;z<=20;z+=4)gp.push(-70,0,z,70,0,z);
+    for(let x=-70;x<=70;x+=4)gp.push(x,0,-90,x,0,20);
+    const gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.Float32BufferAttribute(gp,3));
+    const gridMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:ADD,uniforms:{uA:{value:.11}},
+      vertexShader:`varying float vF;void main(){vec4 m=modelViewMatrix*vec4(position,1.);vF=1.-smoothstep(8.,70.,-m.z);gl_Position=projectionMatrix*m;}`,
+      fragmentShader:`uniform float uA;varying float vF;void main(){gl_FragColor=vec4(.83,.69,.22,uA*vF);}`});
+    const grid=new THREE.LineSegments(gg,gridMat);grid.position.y=-5.5;grid.frustumCulled=false;scene.add(grid);
+
+    /* Input */
+    const m={x:0,y:0,tx:0,ty:0,px:innerWidth/2,py:innerHeight/2};
+    addEventListener('pointermove',e=>{m.tx=e.clientX/innerWidth*2-1;m.ty=-(e.clientY/innerHeight*2-1);m.px=e.clientX;m.py=e.clientY;},{passive:true});
+    let sc=0,scL=0;
+    addEventListener('scroll',()=>{sc=scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight);},{passive:true});
+
+    function resize(){
+      renderer.setSize(innerWidth,innerHeight,false);
+      cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();
+      pu.uPx.value=dpr*(mobile?2:2.4);kMat.uniforms.uPx.value=dpr;
+    }
+    addEventListener('resize',resize);resize();
+
+    let T=0,pt=8,hov=0,last=performance.now(),raf=0,fr=0,acc=0,first=true;
+    function frame(now){
+      raf=requestAnimationFrame(frame);
+      const dt=Math.min((now-last)/1000,.05);last=now;
+      const k=1-Math.exp(-dt*4);
+      T+=dt*S.speed;
+      m.x+=(m.tx-m.x)*k;m.y+=(m.ty-m.y)*k;scL+=(sc-scL)*k;
+      const par=reduced?0:1;
+      cam.position.set(m.x*1.4*par,m.y*.9*par-scL*4,14);cam.lookAt(0,-scL*2,0);
+      shield.position.y=scL*2.5;glowPlane.position.y=scL*2.5;
+      if(!reduced){pt+=dt;if(pt>17)pt=0;}
+      const p=pt<4?pt/4:-1,boost=p>=0?Math.sin(Math.PI*p):0;
+      hov+=(((m.x*m.x+m.y*m.y)<.14?1:0)-hov)*k;
+      shield.rotation.y+=dt*S.speed*(Math.PI*2/30)*(1+2.2*hov);
+      sMatL.opacity=.7+.2*hov+.15*boost+.05*Math.sin(T*1.3);
+      gMat.uniforms.uG.value=.1*S.bloom*(1+boost);
+      pu.uT.value=T;pu.uPulse.value=p;pu.uBloom.value=S.bloom;
+      gridMat.uniforms.uA.value=.11*S.grid*(1+boost*.8);
+      grid.position.z=(T*.9)%4;
+      for(let i=0;i<N;i++){
+        lineMats[i].opacity=.12+.22*Math.pow(Math.max(0,Math.sin(T*.7+i*1.3)),6)+.1*boost;
+        for(let j=0;j<P;j++){
+          const u=(j/P+T*spd[i])%1,idx=i*P+j;
+          curves[i].getPoint(u,tmp);tmp.toArray(pkPos,idx*3);pkA[idx]=Math.sin(Math.PI*u)*.9;
+        }
+      }
+      pk.attributes.position.needsUpdate=true;pk.attributes.aA.needsUpdate=true;
+      renderer.render(scene,cam);
+      if(first){first=false;canvas.classList.add('on');}
+      acc+=dt;if(++fr===120){if(acc/120>.0222&&dpr>1){dpr=1;renderer.setPixelRatio(1);resize();}fr=0;acc=0;}
+    }
+    raf=requestAnimationFrame(frame);
+
+    document.addEventListener('visibilitychange',()=>{
+      if(document.hidden){cancelAnimationFrame(raf);raf=0;}
+      else if(!raf){last=performance.now();raf=requestAnimationFrame(frame);}
+    });
+    addEventListener('pagehide',()=>{
+      cancelAnimationFrame(raf);
+      scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});
+      renderer.dispose();
+    });
+  })();
+  </script>
+</body>
+</html>
