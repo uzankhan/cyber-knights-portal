@@ -9,74 +9,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./css/style.css" />
 
-  <!-- ============================================================
-       NEW 3D BACKGROUND — Burgundy · Gold · Cream
-       ============================================================ -->
   <style>
-    /* ---- Background container (fixed, behind everything) ---- */
     #bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-      pointer-events: none;
+      position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
       background: radial-gradient(ellipse at 50% 45%, #2E1120 0%, #240C18 38%, #1A0810 80%);
     }
-    #bg-canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      transition: opacity 2s ease;
-    }
+    #bg-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 2s ease; }
     #bg-canvas.on { opacity: 1; }
-
     #bg .vig {
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background: radial-gradient(ellipse at center, transparent 35%, rgba(10, 3, 6, 0.85) 100%);
       animation: bgBreathe 30s ease-in-out infinite;
     }
     @keyframes bgBreathe { 50% { opacity: .6; } }
-
     #bg .aurora {
-      position: absolute;
-      width: 70vmax;
-      height: 70vmax;
-      left: -20vmax;
-      top: -25vmax;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(178, 58, 72, 0.16), transparent 65%);
-      filter: blur(40px);
-      animation: bgDrift 40s ease-in-out infinite alternate;
+      position: absolute; width: 70vmax; height: 70vmax; left: -20vmax; top: -25vmax;
+      border-radius: 50%; background: radial-gradient(circle, rgba(178, 58, 72, 0.16), transparent 65%);
+      filter: blur(40px); animation: bgDrift 40s ease-in-out infinite alternate;
     }
     #bg .aurora.b {
-      left: auto;
-      right: -25vmax;
-      top: auto;
-      bottom: -30vmax;
+      left: auto; right: -25vmax; top: auto; bottom: -30vmax;
       background: radial-gradient(circle, rgba(212, 175, 55, 0.09), transparent 65%);
       animation-duration: 55s;
     }
     @keyframes bgDrift { to { transform: translate(12vmax, 8vmax) scale(1.15); } }
-
     #bg .ray {
-      position: absolute;
-      top: -20%;
-      width: 30vmax;
-      height: 140%;
+      position: absolute; top: -20%; width: 30vmax; height: 140%;
       background: linear-gradient(180deg, rgba(244, 228, 166, 0.05), transparent 75%);
-      filter: blur(18px);
-      transform-origin: top center;
-      mix-blend-mode: screen;
+      filter: blur(18px); transform-origin: top center; mix-blend-mode: screen;
     }
     #bg .ray.l { left: -4%; animation: bgSwayL 24s ease-in-out infinite alternate; }
     #bg .ray.r { right: -4%; animation: bgSwayR 31s ease-in-out infinite alternate; }
     @keyframes bgSwayL { from { transform: rotate(-26deg); } to { transform: rotate(-16deg); } }
     @keyframes bgSwayR { from { transform: rotate(26deg); } to { transform: rotate(16deg); } }
 
-    /* ---- Portal body -- Before/After ambient tints (Burgundy + Gold) ---- */
     body::before {
       background:
         radial-gradient(circle at 15% 10%, rgba(212, 175, 55, 0.08), transparent 40%),
@@ -87,9 +53,6 @@
       background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent) !important;
     }
 
-    /* ============================================================
-       TRANSPARENCY OVERRIDES — Burgundy + Gold Edition
-       ============================================================ */
     html, body, .view, main, section, header, footer, aside, nav,
     .topbar, .content, .page, .card, .cards-grid, .info-box,
     .table-wrap, .data-table, .data-table th, .data-table td,
@@ -112,25 +75,12 @@
       box-shadow: none !important;
     }
 
-    /* Keep borders subtle gold glow */
-    .topbar,
-    .content-header,
-    .modal-card,
-    .login-card-clean,
-    .card,
-    .section-block,
-    .info-box,
-    .table-wrap,
-    .admin-toolbar,
-    .progress-hero,
-    .progress-card,
-    .assignment-card,
-    .quiz-card,
-    .exam-card {
+    .topbar, .content-header, .modal-card, .login-card-clean, .card,
+    .section-block, .info-box, .table-wrap, .admin-toolbar,
+    .progress-hero, .progress-card, .assignment-card, .quiz-card, .exam-card {
       border: 1px solid rgba(212, 175, 55, 0.18) !important;
     }
 
-    /* Primary button — rich gold */
     .btn-primary {
       background: linear-gradient(135deg, rgba(212, 175, 55, 0.92) 0%, rgba(139, 105, 20, 0.92) 100%) !important;
       color: #1A0810 !important;
@@ -139,7 +89,6 @@
     .btn-primary:hover:not(:disabled) {
       box-shadow: 0 8px 30px rgba(212, 175, 55, 0.55), 0 0 40px rgba(212, 175, 55, 0.3) !important;
     }
-
     .btn-secondary {
       background: rgba(212, 175, 55, 0.06) !important;
       border: 1.5px solid rgba(212, 175, 55, 0.28) !important;
@@ -150,7 +99,6 @@
       border-color: rgba(212, 175, 55, 0.5) !important;
       color: #D4AF37 !important;
     }
-
     .mini-btn {
       background: rgba(212, 175, 55, 0.06) !important;
       border: 1px solid rgba(212, 175, 55, 0.2) !important;
@@ -161,7 +109,6 @@
       border-color: rgba(212, 175, 55, 0.5) !important;
       color: #D4AF37 !important;
     }
-
     .icon-btn {
       background: rgba(212, 175, 55, 0.06) !important;
       border: 1.5px solid rgba(212, 175, 55, 0.22) !important;
@@ -172,7 +119,6 @@
       border-color: #D4AF37 !important;
       color: #D4AF37 !important;
     }
-
     .nav-link.active {
       background: rgba(212, 175, 55, 0.08) !important;
       color: #D4AF37 !important;
@@ -181,42 +127,28 @@
       background: rgba(212, 175, 55, 0.08) !important;
       color: #D4AF37 !important;
     }
-
-    /* Inputs — burgundy dark with gold focus */
-    .form-group input,
-    .form-group select,
-    textarea {
+    .form-group input, .form-group select, textarea {
       background: rgba(26, 8, 16, 0.55) !important;
       border: 1.5px solid rgba(212, 175, 55, 0.22) !important;
       color: #FAF3E3 !important;
     }
-    .form-group input::placeholder,
-    textarea::placeholder {
+    .form-group input::placeholder, textarea::placeholder {
       color: rgba(212, 197, 168, 0.5) !important;
     }
-    .form-group input:focus,
-    .form-group select:focus,
-    textarea:focus {
+    .form-group input:focus, .form-group select:focus, textarea:focus {
       border-color: rgba(212, 175, 55, 0.7) !important;
       box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.12), 0 0 20px rgba(212, 175, 55, 0.25) !important;
       background: rgba(26, 8, 16, 0.75) !important;
     }
-
-    /* Success overlay — gold glow */
     .success-msg {
       background: rgba(46, 17, 32, 0.92) !important;
       backdrop-filter: blur(20px) !important;
       -webkit-backdrop-filter: blur(20px) !important;
       border: 2px solid #D4AF37 !important;
       color: #D4AF37 !important;
-      box-shadow:
-        0 20px 60px rgba(212, 175, 55, 0.3),
-        0 0 0 8px rgba(212, 175, 55, 0.08),
-        0 0 80px rgba(212, 175, 55, 0.3) !important;
+      box-shadow: 0 20px 60px rgba(212, 175, 55, 0.3), 0 0 0 8px rgba(212, 175, 55, 0.08), 0 0 80px rgba(212, 175, 55, 0.3) !important;
     }
     .success-icon { background: #D4AF37 !important; color: #1A0810 !important; }
-
-    /* Toast — burgundy + gold accent */
     .toast {
       background: rgba(46, 17, 32, 0.95) !important;
       backdrop-filter: blur(20px) !important;
@@ -227,17 +159,8 @@
     .toast.success { border-left-color: #D4AF37 !important; }
     .toast.error { border-left-color: #B23A48 !important; }
     .toast.info { border-left-color: #E8D5B7 !important; }
-
-    /* Tables — burgundy */
-    .data-table th {
-      background: rgba(212, 175, 55, 0.05) !important;
-      color: #D4AF37 !important;
-    }
-    .data-table tr:hover td {
-      background: rgba(212, 175, 55, 0.06) !important;
-    }
-
-    /* Modal */
+    .data-table th { background: rgba(212, 175, 55, 0.05) !important; color: #D4AF37 !important; }
+    .data-table tr:hover td { background: rgba(212, 175, 55, 0.06) !important; }
     .modal-overlay {
       background: rgba(26, 8, 16, 0.7) !important;
       backdrop-filter: blur(10px) !important;
@@ -250,8 +173,6 @@
       border: 1.5px solid rgba(212, 175, 55, 0.3) !important;
       box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7), 0 0 80px rgba(212, 175, 55, 0.12) !important;
     }
-
-    /* Login card */
     .login-card-clean {
       background: rgba(46, 17, 32, 0.6) !important;
       backdrop-filter: blur(16px) !important;
@@ -259,29 +180,17 @@
       box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.7), 0 0 60px rgba(212, 175, 55, 0.1) !important;
       border: 1px solid rgba(212, 175, 55, 0.2) !important;
     }
-
-    /* Progress bar — gold */
     .progress-bar {
       background: linear-gradient(90deg, #8B6914 0%, #D4AF37 50%, #F4E4A6 100%) !important;
       box-shadow: 0 0 20px rgba(212, 175, 55, 0.7) !important;
     }
-    .progress-bar-wrap {
-      background: rgba(212, 175, 55, 0.08) !important;
-    }
-
-    /* Badges */
-    .quiz-timer,
-    .quiz-done,
-    .assignment-status.submitted,
-    .log-success,
-    .duration-live,
-    .ip-cell {
+    .progress-bar-wrap { background: rgba(212, 175, 55, 0.08) !important; }
+    .quiz-timer, .quiz-done, .assignment-status.submitted, .log-success, .duration-live, .ip-cell {
       background: rgba(212, 175, 55, 0.1) !important;
       color: #D4AF37 !important;
       border-color: rgba(212, 175, 55, 0.3) !important;
     }
-    .assignment-status.expired,
-    .log-fail {
+    .assignment-status.expired, .log-fail {
       background: rgba(178, 58, 72, 0.12) !important;
       color: #E8A0AA !important;
       border-color: rgba(178, 58, 72, 0.35) !important;
@@ -291,7 +200,6 @@
       color: #C9A227 !important;
       border-color: rgba(201, 162, 39, 0.35) !important;
     }
-
     .quiz-score-circle.pass {
       background: radial-gradient(circle, rgba(212, 175, 55, 0.22), rgba(212, 175, 55, 0.05)) !important;
       border-color: #D4AF37 !important;
@@ -300,11 +208,7 @@
       background: radial-gradient(circle, rgba(178, 58, 72, 0.22), rgba(178, 58, 72, 0.05)) !important;
       border-color: #B23A48 !important;
     }
-
-    /* Cursor ring + dot — Gold */
-    .cursor-ring {
-      border-color: rgba(212, 175, 55, 0.55) !important;
-    }
+    .cursor-ring { border-color: rgba(212, 175, 55, 0.55) !important; }
     .cursor-ring.big {
       border-color: #D4AF37 !important;
       background: rgba(212, 175, 55, 0.1) !important;
@@ -314,443 +218,138 @@
       background: #D4AF37 !important;
       box-shadow: 0 0 16px #D4AF37, 0 0 32px rgba(212, 175, 55, 0.3) !important;
     }
-
-    /* Grain, trail — keep subtle */
     .grain { opacity: 0.045 !important; }
-
     * { animation-play-state: running !important; }
-
     @media (prefers-reduced-motion: reduce) {
       #bg .aurora, #bg .ray, #bg .vig, body::after { animation: none !important; }
     }
 
-    /* ============================================================
-   BOOK HERO — Compact Fix + Logo Cover
-   ============================================================ */
+    /* BOOK HERO — Compact Fix + Logo Cover */
+    .book-hero { min-height: auto !important; padding: 44px 20px 56px !important; margin: 20px auto 0 !important; }
+    .book-scene { height: auto !important; min-height: 420px !important; margin-bottom: 0 !important; }
+    .book-hero-stats { margin: -4px 0 18px !important; }
+    .book-start-btn { margin-top: 4px !important; }
+    .book-progress-wrap { margin-top: 18px !important; }
+    .book-why, .book-build, .book-start-here { margin-top: 60px !important; }
+    .curriculum-outline { margin-top: 60px !important; }
+    .book-outline-wrap { margin-top: 60px !important; }
+    .cover-emblem { padding: 0 !important; overflow: hidden !important; background: rgba(0, 0, 0, 0.15) !important; }
+    .cover-emblem img {
+      width: 100%; height: 100%; object-fit: contain; padding: 8px; display: block;
+      filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.55));
+    }
+    .book-3d:not(.is-opening):not(.is-open) .book-page-spread { opacity: 0 !important; pointer-events: none; }
 
-/* 1. Hero ko auto-height karo — bada empty space khatam */
-.book-hero {
-  min-height: auto !important;
-  padding: 44px 20px 56px !important;
-  margin: 20px auto 0 !important;
-}
-.book-scene {
-  height: auto !important;
-  min-height: 420px !important;
-  margin-bottom: 0 !important;
-}
-.book-hero-stats {
-  margin: -4px 0 18px !important;
-}
-.book-start-btn {
-  margin-top: 4px !important;
-}
-.book-progress-wrap {
-  margin-top: 18px !important;
-}
+    #page-books .book-hero::before,
+    #page-books .book-hero::after { display: none !important; }
+    #page-books .book-hero { min-height: 0 !important; height: auto !important; padding: 28px 20px 44px !important; margin: 16px auto 0 !important; }
+    #page-books .book-scene { height: 380px !important; min-height: 0 !important; margin: 0 !important; transform: none !important; }
+    #page-books .book-scene::before { display: none !important; }
+    #page-books .book-hero-stats { margin: 8px 0 16px !important; }
+    #page-books .book-start-btn { margin-top: 0 !important; }
+    #page-books .book-progress-wrap { margin-top: 16px !important; }
+    #page-books .book-why, #page-books .book-build, #page-books .book-start-here, #page-books .book-outline-wrap { margin-top: 56px !important; }
+    #page-books .curriculum-outline { margin-top: 56px !important; }
+    #page-books .cover-emblem { padding: 0 !important; overflow: hidden !important; background: rgba(0, 0, 0, 0.15) !important; }
+    #page-books .cover-emblem img { width: 100%; height: 100%; object-fit: contain; padding: 6px; display: block; filter: drop-shadow(0 0 14px rgba(212, 175, 55, 0.6)); }
+    #page-books .book-3d:not(.is-opening):not(.is-open) .book-page-spread { opacity: 0 !important; pointer-events: none !important; }
 
-/* 2. Book ke baad wale sections ke bade gaps chote karo */
-.book-why,
-.book-build,
-.book-start-here {
-  margin-top: 60px !important;
-}
-.curriculum-outline {
-  margin-top: 60px !important;
-}
-.book-outline-wrap {
-  margin-top: 60px !important;
-}
-
-/* 3. Book cover pe logo.png dikhane ka style */
-.cover-emblem {
-  padding: 0 !important;
-  overflow: hidden !important;
-  background: rgba(0, 0, 0, 0.15) !important;
-}
-.cover-emblem img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: 8px;
-  display: block;
-  filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.55));
-}
-
-/* 4. Safety — book ko force closed state mein rakho agar open nahi kiya */
-.book-3d:not(.is-opening):not(.is-open) .book-page-spread {
-  opacity: 0 !important;
-  pointer-events: none;
-}
-
-/* ============================================================
-   BOOK HERO — TIGHT SPACING FIX (Kill all the empty space)
-   ============================================================ */
-
-/* Kill decorative circles that create phantom space */
-#page-books .book-hero::before,
-#page-books .book-hero::after {
-  display: none !important;
-}
-
-/* Hero: auto height, tight padding */
-#page-books .book-hero {
-  min-height: 0 !important;
-  height: auto !important;
-  padding: 28px 20px 44px !important;
-  margin: 16px auto 0 !important;
-}
-
-/* Book scene: shrink and remove internal margins */
-#page-books .book-scene {
-  height: 380px !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  transform: none !important;
-}
-#page-books .book-scene::before {
-  display: none !important;
-}
-
-/* Reduce gap between stats and button */
-#page-books .book-hero-stats {
-  margin: 8px 0 16px !important;
-}
-#page-books .book-start-btn {
-  margin-top: 0 !important;
-}
-#page-books .book-progress-wrap {
-  margin-top: 16px !important;
-}
-
-/* Kill huge 108px gaps in section stacking */
-#page-books .book-why,
-#page-books .book-build,
-#page-books .book-start-here,
-#page-books .book-outline-wrap {
-  margin-top: 56px !important;
-}
-#page-books .curriculum-outline {
-  margin-top: 56px !important;
-}
-
-/* Book cover logo (img) styling */
-#page-books .cover-emblem {
-  padding: 0 !important;
-  overflow: hidden !important;
-  background: rgba(0, 0, 0, 0.15) !important;
-}
-#page-books .cover-emblem img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: 6px;
-  display: block;
-  filter: drop-shadow(0 0 14px rgba(212, 175, 55, 0.6));
-}
-
-/* Safety: book stays closed until clicked */
-#page-books .book-3d:not(.is-opening):not(.is-open) .book-page-spread {
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* ============================================================
-   BOOK MANAGER — Admin Book Editor
-   ============================================================ */
-.bm-layout {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 20px;
-  align-items: start;
-  min-height: 600px;
-}
-@media (max-width: 900px) {
-  .bm-layout { grid-template-columns: 1fr; }
-}
-
-.bm-sidebar {
-  background: rgba(46, 17, 32, 0.5);
-  border: 1.5px solid rgba(212, 175, 55, 0.2);
-  border-radius: 12px;
-  overflow: hidden;
-  max-height: 720px;
-  display: flex;
-  flex-direction: column;
-}
-.bm-sidebar-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  border-bottom: 1.5px solid rgba(212, 175, 55, 0.15);
-  background: rgba(212, 175, 55, 0.04);
-}
-.bm-kicker {
-  font: 600 10px 'JetBrains Mono', monospace;
-  letter-spacing: 0.15em;
-  color: #D4AF37;
-  text-transform: uppercase;
-}
-.bm-count {
-  font: 500 10px 'JetBrains Mono', monospace;
-  color: #D4C5A8;
-  padding: 3px 8px;
-  background: rgba(212, 175, 55, 0.08);
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  border-radius: 10px;
-}
-.bm-tree {
-  padding: 8px;
-  overflow-y: auto;
-  flex: 1;
-}
-.bm-module {
-  margin-bottom: 6px;
-}
-.bm-module-head {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 8px;
-  align-items: center;
-  padding: 10px 12px;
-  background: rgba(212, 175, 55, 0.06);
-  border: 1px solid rgba(212, 175, 55, 0.15);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.bm-module-head:hover {
-  border-color: rgba(212, 175, 55, 0.4);
-  background: rgba(212, 175, 55, 0.1);
-}
-.bm-module-title {
-  font: 600 12px 'Manrope', sans-serif;
-  color: #FAF3E3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.bm-module-count {
-  font: 500 9px 'JetBrains Mono', monospace;
-  color: #D4C5A8;
-  padding: 2px 6px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-}
-.bm-module-actions {
-  display: flex;
-  gap: 2px;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.bm-module-head:hover .bm-module-actions {
-  opacity: 1;
-}
-.bm-icon-btn {
-  width: 22px;
-  height: 22px;
-  display: grid;
-  place-items: center;
-  background: transparent;
-  border: none;
-  color: #D4C5A8;
-  cursor: pointer;
-  border-radius: 4px;
-  font-size: 12px;
-  transition: all 0.15s;
-}
-.bm-icon-btn:hover {
-  background: rgba(212, 175, 55, 0.15);
-  color: #D4AF37;
-}
-.bm-icon-btn.danger:hover {
-  background: rgba(178, 58, 72, 0.2);
-  color: #B23A48;
-}
-
-.bm-chapters {
-  padding: 4px 0 4px 12px;
-  display: none;
-}
-.bm-module.expanded .bm-chapters {
-  display: block;
-}
-.bm-chapter {
-  display: grid;
-  grid-template-columns: 32px 1fr auto;
-  gap: 8px;
-  align-items: center;
-  padding: 8px 10px;
-  border-left: 2px solid transparent;
-  border-radius: 0 6px 6px 0;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.bm-chapter:hover {
-  background: rgba(212, 175, 55, 0.06);
-  border-left-color: rgba(212, 175, 55, 0.4);
-}
-.bm-chapter.active {
-  background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent);
-  border-left-color: #D4AF37;
-}
-.bm-chapter-id {
-  font: 600 10px 'JetBrains Mono', monospace;
-  color: #D4AF37;
-}
-.bm-chapter-title {
-  font: 500 11.5px 'Manrope', sans-serif;
-  color: #D4C5A8;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.bm-editor {
-  background: rgba(46, 17, 32, 0.5);
-  border: 1.5px solid rgba(212, 175, 55, 0.2);
-  border-radius: 12px;
-  min-height: 600px;
-  padding: 26px 28px;
-}
-.bm-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  height: 500px;
-  color: #8B7B5F;
-  text-align: center;
-}
-.bm-empty svg {
-  color: rgba(212, 175, 55, 0.3);
-}
-.bm-empty p {
-  font: 500 14px 'Manrope', sans-serif;
-  color: #D4C5A8;
-}
-.bm-empty span {
-  font: 400 12px 'Manrope', sans-serif;
-  color: #8B7B5F;
-}
-
-.bm-form-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 22px;
-  padding-bottom: 16px;
-  border-bottom: 1.5px solid rgba(212, 175, 55, 0.15);
-}
-.bm-form-head h3 {
-  font: 500 1.3rem 'Fraunces', serif;
-  color: #FAF3E3;
-  letter-spacing: -0.02em;
-}
-.bm-form-head-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.bm-field {
-  margin-bottom: 16px;
-}
-.bm-field label {
-  display: block;
-  font: 600 10px 'JetBrains Mono', monospace;
-  letter-spacing: 0.12em;
-  color: #D4AF37;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.bm-field input,
-.bm-field textarea {
-  width: 100%;
-  padding: 11px 14px;
-  background: rgba(26, 8, 16, 0.6) !important;
-  border: 1.5px solid rgba(212, 175, 55, 0.22) !important;
-  border-radius: 8px;
-  color: #FAF3E3;
-  font: 400 13px 'Manrope', sans-serif;
-  outline: none;
-  transition: all 0.25s;
-}
-.bm-field input:focus,
-.bm-field textarea:focus {
-  border-color: #D4AF37 !important;
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12) !important;
-}
-.bm-field textarea {
-  resize: vertical;
-  min-height: 60px;
-  font-family: 'Manrope', sans-serif;
-}
-.bm-field textarea.code {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  min-height: 340px;
-  line-height: 1.6;
-}
-.bm-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 12px;
-}
-@media (max-width: 700px) {
-  .bm-row { grid-template-columns: 1fr; }
-}
-.bm-hint {
-  font: 400 11px 'Manrope', sans-serif;
-  color: #8B7B5F;
-  margin-top: 5px;
-}
-.bm-preview-toggle {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 10px;
-  border: 1px solid rgba(212, 175, 55, 0.15);
-  border-radius: 6px;
-  padding: 3px;
-  width: fit-content;
-}
-.bm-preview-toggle button {
-  background: transparent;
-  border: none;
-  padding: 6px 14px;
-  font: 600 10px 'JetBrains Mono', monospace;
-  letter-spacing: 0.08em;
-  color: #8B7B5F;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-.bm-preview-toggle button.active {
-  background: rgba(212, 175, 55, 0.15);
-  color: #D4AF37;
-}
-.bm-preview {
-  border: 1.5px solid rgba(212, 175, 55, 0.15);
-  border-radius: 8px;
-  padding: 18px;
-  background: rgba(26, 8, 16, 0.4);
-  min-height: 340px;
-  max-height: 500px;
-  overflow-y: auto;
-}
-.bm-preview .chapter-content {
-  max-width: 100%;
-  font-size: 13px;
-}
+    /* BOOK MANAGER */
+    .bm-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; min-height: 600px; }
+    @media (max-width: 900px) { .bm-layout { grid-template-columns: 1fr; } }
+    .bm-sidebar {
+      background: rgba(46, 17, 32, 0.5); border: 1.5px solid rgba(212, 175, 55, 0.2);
+      border-radius: 12px; overflow: hidden; max-height: 720px; display: flex; flex-direction: column;
+    }
+    .bm-sidebar-head {
+      display: flex; align-items: center; justify-content: space-between; padding: 14px 18px;
+      border-bottom: 1.5px solid rgba(212, 175, 55, 0.15); background: rgba(212, 175, 55, 0.04);
+    }
+    .bm-kicker { font: 600 10px 'JetBrains Mono', monospace; letter-spacing: 0.15em; color: #D4AF37; text-transform: uppercase; }
+    .bm-count {
+      font: 500 10px 'JetBrains Mono', monospace; color: #D4C5A8; padding: 3px 8px;
+      background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 10px;
+    }
+    .bm-tree { padding: 8px; overflow-y: auto; flex: 1; }
+    .bm-module { margin-bottom: 6px; }
+    .bm-module-head {
+      display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center;
+      padding: 10px 12px; background: rgba(212, 175, 55, 0.06);
+      border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 8px; cursor: pointer; transition: all 0.2s;
+    }
+    .bm-module-head:hover { border-color: rgba(212, 175, 55, 0.4); background: rgba(212, 175, 55, 0.1); }
+    .bm-module-title { font: 600 12px 'Manrope', sans-serif; color: #FAF3E3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bm-module-count { font: 500 9px 'JetBrains Mono', monospace; color: #D4C5A8; padding: 2px 6px; background: rgba(0, 0, 0, 0.3); border-radius: 4px; }
+    .bm-module-actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.2s; }
+    .bm-module-head:hover .bm-module-actions { opacity: 1; }
+    .bm-icon-btn {
+      width: 22px; height: 22px; display: grid; place-items: center; background: transparent;
+      border: none; color: #D4C5A8; cursor: pointer; border-radius: 4px; font-size: 12px; transition: all 0.15s;
+    }
+    .bm-icon-btn:hover { background: rgba(212, 175, 55, 0.15); color: #D4AF37; }
+    .bm-icon-btn.danger:hover { background: rgba(178, 58, 72, 0.2); color: #B23A48; }
+    .bm-chapters { padding: 4px 0 4px 12px; display: none; }
+    .bm-module.expanded .bm-chapters { display: block; }
+    .bm-chapter {
+      display: grid; grid-template-columns: 32px 1fr auto; gap: 8px; align-items: center;
+      padding: 8px 10px; border-left: 2px solid transparent; border-radius: 0 6px 6px 0; cursor: pointer; transition: all 0.2s;
+    }
+    .bm-chapter:hover { background: rgba(212, 175, 55, 0.06); border-left-color: rgba(212, 175, 55, 0.4); }
+    .bm-chapter.active { background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent); border-left-color: #D4AF37; }
+    .bm-chapter-id { font: 600 10px 'JetBrains Mono', monospace; color: #D4AF37; }
+    .bm-chapter-title { font: 500 11.5px 'Manrope', sans-serif; color: #D4C5A8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bm-editor { background: rgba(46, 17, 32, 0.5); border: 1.5px solid rgba(212, 175, 55, 0.2); border-radius: 12px; min-height: 600px; padding: 26px 28px; }
+    .bm-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; height: 500px; color: #8B7B5F; text-align: center;
+    }
+    .bm-empty svg { color: rgba(212, 175, 55, 0.3); }
+    .bm-empty p { font: 500 14px 'Manrope', sans-serif; color: #D4C5A8; }
+    .bm-empty span { font: 400 12px 'Manrope', sans-serif; color: #8B7B5F; }
+    .bm-form-head {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px;
+      padding-bottom: 16px; border-bottom: 1.5px solid rgba(212, 175, 55, 0.15);
+    }
+    .bm-form-head h3 { font: 500 1.3rem 'Fraunces', serif; color: #FAF3E3; letter-spacing: -0.02em; }
+    .bm-form-head-actions { display: flex; gap: 8px; }
+    .bm-field { margin-bottom: 16px; }
+    .bm-field label {
+      display: block; font: 600 10px 'JetBrains Mono', monospace; letter-spacing: 0.12em;
+      color: #D4AF37; text-transform: uppercase; margin-bottom: 8px;
+    }
+    .bm-field input, .bm-field textarea {
+      width: 100%; padding: 11px 14px; background: rgba(26, 8, 16, 0.6) !important;
+      border: 1.5px solid rgba(212, 175, 55, 0.22) !important; border-radius: 8px;
+      color: #FAF3E3; font: 400 13px 'Manrope', sans-serif; outline: none; transition: all 0.25s;
+    }
+    .bm-field input:focus, .bm-field textarea:focus {
+      border-color: #D4AF37 !important;
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12) !important;
+    }
+    .bm-field textarea { resize: vertical; min-height: 60px; font-family: 'Manrope', sans-serif; }
+    .bm-field textarea.code { font-family: 'JetBrains Mono', monospace; font-size: 12px; min-height: 340px; line-height: 1.6; }
+    .bm-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    @media (max-width: 700px) { .bm-row { grid-template-columns: 1fr; } }
+    .bm-hint { font: 400 11px 'Manrope', sans-serif; color: #8B7B5F; margin-top: 5px; }
+    .bm-preview-toggle {
+      display: flex; gap: 4px; margin-bottom: 10px;
+      border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 6px; padding: 3px; width: fit-content;
+    }
+    .bm-preview-toggle button {
+      background: transparent; border: none; padding: 6px 14px;
+      font: 600 10px 'JetBrains Mono', monospace; letter-spacing: 0.08em; color: #8B7B5F;
+      text-transform: uppercase; cursor: pointer; border-radius: 4px; transition: all 0.2s;
+    }
+    .bm-preview-toggle button.active { background: rgba(212, 175, 55, 0.15); color: #D4AF37; }
+    .bm-preview {
+      border: 1.5px solid rgba(212, 175, 55, 0.15); border-radius: 8px; padding: 18px;
+      background: rgba(26, 8, 16, 0.4); min-height: 340px; max-height: 500px; overflow-y: auto;
+    }
+    .bm-preview .chapter-content { max-width: 100%; font-size: 13px; }
   </style>
 </head>
 <body>
 
-  <!-- ============================================================
-       NEW 3D BACKGROUND — Vault (Burgundy · Gold · Cream)
-       ============================================================ -->
   <div id="bg">
     <div class="aurora"></div>
     <div class="aurora b"></div>
@@ -760,15 +359,11 @@
     <div class="vig"></div>
   </div>
 
-  <!-- Portal FX Layers (custom cursor + grain + trail) -->
   <div class="grain"></div>
   <canvas id="trail"></canvas>
   <div class="cursor-ring" id="cring"></div>
   <div class="cursor-dot" id="cdot"></div>
 
-  <!-- ============================================================
-       SPLASH SCREEN
-       ============================================================ -->
   <div id="splash-screen">
     <div class="splash-inner">
       <div class="splash-ring"></div>
@@ -781,9 +376,6 @@
     </div>
   </div>
 
-  <!-- ============================================================
-       LOGIN VIEW
-       ============================================================ -->
   <div id="login-view" class="view">
     <div class="login-page">
       <div class="login-brand">
@@ -826,12 +418,8 @@
     </div>
   </div>
 
-  <!-- ============================================================
-       APP VIEW
-       ============================================================ -->
   <div id="app-view" class="view">
 
-    <!-- TOPBAR -->
     <header class="topbar">
       <div class="topbar-left">
         <div class="logo-mini">
@@ -856,9 +444,6 @@
 
     <main class="content">
 
-      <!-- ============================================================
-           DASHBOARD
-           ============================================================ -->
       <section id="page-dashboard" class="page active">
         <h2>Welcome, <span id="dash-name">User</span></h2>
         <div class="cards-grid" id="dash-cards"></div>
@@ -868,25 +453,19 @@
         </div>
       </section>
 
-      <!-- ============================================================
-           RECORDS
-           ============================================================ -->
       <section id="page-records" class="page">
         <h2>Student Records</h2>
         <p class="page-sub">School-wide student list.</p>
         <div class="table-wrap">
           <table class="data-table" id="records-table">
             <thead>
-              <tr><th>ID</th><th>Name</th><th>Class</th><th>Attendance</th><th>Status</th></tr>
+              <tr><th>ID</th><th>Name</th><th>Course</th><th>Attendance</th><th>Status</th></tr>
             </thead>
             <tbody></tbody>
           </table>
         </div>
       </section>
 
-      <!-- ============================================================
-           ASSIGNMENTS
-           ============================================================ -->
       <section id="page-assignments" class="page">
         <h2>Assignments</h2>
         <p class="page-sub" id="assignments-subtitle">Current and upcoming assignments.</p>
@@ -897,9 +476,6 @@
         <div class="cards-grid" id="assignments-list"></div>
       </section>
 
-      <!-- ============================================================
-           QUIZZES
-           ============================================================ -->
       <section id="page-quizzes" class="page">
         <h2>Quizzes</h2>
         <p class="page-sub" id="quizzes-subtitle">Attempt assigned quizzes.</p>
@@ -910,9 +486,6 @@
         <div class="cards-grid" id="quizzes-list"></div>
       </section>
 
-      <!-- ============================================================
-           EXAMS
-           ============================================================ -->
       <section id="page-exams" class="page">
         <h2>Exams</h2>
         <p class="page-sub" id="exams-subtitle">Mid-term, final and other exams.</p>
@@ -923,40 +496,32 @@
         <div class="cards-grid" id="exams-list"></div>
       </section>
 
-      <!-- ============================================================
-           RESULTS
-           ============================================================ -->
       <section id="page-results" class="page">
-  <h2>Examination Results</h2>
-  <p class="page-sub">Latest exam scores.</p>
+        <h2>Examination Results</h2>
+        <p class="page-sub">Latest exam scores.</p>
 
-  <!-- NEW: Results Tabs -->
-  <div class="results-tabs">
-    <button class="results-tab active" data-rtab="exams">Exam Results</button>
-    <button class="results-tab" data-rtab="report">My Report Card</button>
-  </div>
+        <div class="results-tabs">
+          <button class="results-tab active" data-rtab="exams">Exam Results</button>
+          <button class="results-tab" data-rtab="report">My Report Card</button>
+        </div>
 
-  <!-- Existing Exam View -->
-  <div id="results-exams-view">
-    <div class="table-wrap">
-      <table class="data-table" id="results-table">
-        <thead>
-          <tr><th>Student</th><th>Exam</th><th>Score</th><th>Total</th><th>Grade</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
+        <div id="results-exams-view">
+          <div class="table-wrap">
+            <table class="data-table" id="results-table">
+              <thead>
+                <tr><th>Student</th><th>Exam</th><th>Score</th><th>Total</th><th>Grade</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
 
-  <!-- NEW: Report Card View -->
-  <div id="results-report-view" class="hidden">
-    <div id="report-card-summary"></div>
-    <div id="report-card-detail"></div>
-  </div>
-</section>
-      <!-- ============================================================
-           PROGRESS
-           ============================================================ -->
+        <div id="results-report-view" class="hidden">
+          <div id="report-card-summary"></div>
+          <div id="report-card-detail"></div>
+        </div>
+      </section>
+
       <section id="page-progress" class="page">
         <h2>My Progress</h2>
         <p class="page-sub">Track your performance across assignments, quizzes and exams.</p>
@@ -964,17 +529,11 @@
         <div class="progress-breakdown" id="progress-breakdown"></div>
       </section>
 
-      <!-- ============================================================
-           BOOKS / LEARNING LIBRARY
-           ============================================================ -->
       <section id="page-books" class="page">
         <h2>Learning Library</h2>
         <p class="page-sub">Interactive handbook for cyber security fundamentals.</p>
 
-        <!-- ============ BOOK HERO ============ -->
         <div class="book-hero">
-
-          <!-- 3D Book -->
           <div class="book-scene">
             <div class="book-3d" id="book-3d">
               <div class="book-spine"></div>
@@ -983,8 +542,8 @@
                 <div class="cover-inner">
                   <div class="cover-grid"></div>
                   <div class="cover-emblem">
-  <img src="./img/logo.png" alt="Cyber Knights" />
-</div>
+                    <img src="./img/logo.png" alt="Cyber Knights" />
+                  </div>
                   <div class="cover-title">Cyber Knights</div>
                   <div class="cover-subtitle">Security Handbook</div>
                   <div class="cover-divider"></div>
@@ -994,7 +553,6 @@
             </div>
           </div>
 
-          <!-- Hero Stats -->
           <div class="book-hero-stats" id="book-hero-stats">
             <span><strong>63</strong> chapters</span>
             <span class="dot">·</span>
@@ -1003,12 +561,10 @@
             <span><strong>Free</strong> to read</span>
           </div>
 
-          <!-- Start Learning Button -->
           <button class="btn-primary book-start-btn" id="btn-start-learning">
             Start Learning →
           </button>
 
-          <!-- Progress Bar -->
           <div class="book-progress-wrap">
             <div class="book-progress-track">
               <div class="book-progress-bar" id="book-progress-bar"></div>
@@ -1017,7 +573,6 @@
           </div>
         </div>
 
-        <!-- ============ WHY THIS BOOK ============ -->
         <div class="book-why">
           <div class="book-why-header">
             <span class="book-why-tag">WHY THIS BOOK</span>
@@ -1042,7 +597,6 @@
           </div>
         </div>
 
-        <!-- ============ WHAT YOU BUILD ============ -->
         <div class="book-build">
           <div class="book-build-header">
             <span class="book-why-tag">WHAT YOU BUILD</span>
@@ -1082,7 +636,6 @@
           </div>
         </div>
 
-        <!-- ============ START HERE ============ -->
         <div class="book-start-here">
           <div class="bsh-left">
             <span class="book-why-tag">START HERE</span>
@@ -1094,20 +647,14 @@
           </button>
         </div>
 
-        <!-- ============ COMPLETE CURRICULUM OUTLINE ============ -->
         <div class="curriculum-outline">
           <div class="curriculum-header">
             <span class="book-why-tag">THE COMPLETE CURRICULUM</span>
             <h3>Eight modules. Forty-six chapters. One path.</h3>
-            <p>
-              Every module builds on the last. Start at Chapter 0.1 — or jump
-              to any chapter that calls to you. Reading progress is saved automatically.
-            </p>
+            <p>Every module builds on the last. Start at Chapter 0.1 — or jump to any chapter that calls to you. Reading progress is saved automatically.</p>
           </div>
 
           <div class="curriculum-timeline">
-
-            <!-- FRONT MATTER -->
             <div class="curr-module is-front" data-module="front">
               <div class="curr-module-marker">
                 <span class="curr-marker-num">FM</span>
@@ -1122,10 +669,7 @@
                   </div>
                   <span class="curr-module-count">3 chapters</span>
                 </div>
-                <p class="curr-module-desc">
-                  How this handbook is structured, how to navigate it, and the ethics
-                  that govern every lab you'll run.
-                </p>
+                <p class="curr-module-desc">How this handbook is structured, how to navigate it, and the ethics that govern every lab you'll run.</p>
                 <ul class="curr-chapter-list">
                   <li><span class="curr-ch-num">FM.1</span> Preface</li>
                   <li><span class="curr-ch-num">FM.2</span> How to Use This Book</li>
@@ -1134,7 +678,6 @@
               </div>
             </div>
 
-            <!-- MODULE 0 -->
             <div class="curr-module" data-module="m0">
               <div class="curr-module-marker">
                 <span class="curr-marker-num">00</span>
@@ -1149,10 +692,7 @@
                   </div>
                   <span class="curr-module-count">3 chapters</span>
                 </div>
-                <p class="curr-module-desc">
-                  Before you touch a single tool, learn what cyber security actually is,
-                  how attackers and defenders think, and where the ethical line sits.
-                </p>
+                <p class="curr-module-desc">Before you touch a single tool, learn what cyber security actually is, how attackers and defenders think, and where the ethical line sits.</p>
                 <ul class="curr-chapter-list">
                   <li><span class="curr-ch-num">0.1</span> Cyber Security Fundamentals & The CIA Triad</li>
                   <li><span class="curr-ch-num">0.2</span> Hacker Mindset, Ethics & Legal Boundaries</li>
@@ -1161,7 +701,6 @@
               </div>
             </div>
 
-            <!-- MODULE 1 -->
             <div class="curr-module" data-module="m1">
               <div class="curr-module-marker">
                 <span class="curr-marker-num">01</span>
@@ -1176,10 +715,7 @@
                   </div>
                   <span class="curr-module-count">14 chapters</span>
                 </div>
-                <p class="curr-module-desc">
-                  You cannot defend a network you do not understand. Build layer-by-layer
-                  knowledge of how data moves — and where each layer can be attacked.
-                </p>
+                <p class="curr-module-desc">You cannot defend a network you do not understand. Build layer-by-layer knowledge of how data moves — and where each layer can be attacked.</p>
                 <ul class="curr-chapter-list">
                   <li><span class="curr-ch-num">1.1</span> What is a Network? — PAN, LAN, MAN, WAN</li>
                   <li><span class="curr-ch-num">1.2</span> The Role of an ISP</li>
@@ -1199,7 +735,6 @@
               </div>
             </div>
 
-            <!-- MODULE 2 -->
             <div class="curr-module" data-module="m2">
               <div class="curr-module-marker">
                 <span class="curr-marker-num">02</span>
@@ -1214,10 +749,7 @@
                   </div>
                   <span class="curr-module-count">5 chapters</span>
                 </div>
-                <p class="curr-module-desc">
-                  Cryptography is the mathematics of trust. Learn how we keep secrets
-                  secret, verify integrity, and prove identity.
-                </p>
+                <p class="curr-module-desc">Cryptography is the mathematics of trust. Learn how we keep secrets secret, verify integrity, and prove identity.</p>
                 <ul class="curr-chapter-list">
                   <li><span class="curr-ch-num">2.1</span> CIA Triad Applied & Encryption Fundamentals</li>
                   <li><span class="curr-ch-num">2.2</span> Symmetric vs Asymmetric Encryption (AES & RSA)</li>
@@ -1228,7 +760,6 @@
               </div>
             </div>
 
-            <!-- MODULE 3 -->
             <div class="curr-module" data-module="m3">
               <div class="curr-module-marker">
                 <span class="curr-marker-num">03</span>
@@ -1243,10 +774,7 @@
                   </div>
                   <span class="curr-module-count">5 chapters</span>
                 </div>
-                <p class="curr-module-desc">
-                  Malware is the attacker's tool of the trade. Catalog each family —
-                  how they spread, what they do, and how defenders spot them.
-                </p>
+                <p class="curr-module-desc">Malware is the attacker's tool of the trade. Catalog each family — how they spread, what they do, and how defenders spot them.</p>
                 <ul class="curr-chapter-list">
                   <li><span class="curr-ch-num">3.1</span> Virus, Worm & Trojan Horse</li>
                   <li><span class="curr-ch-num">3.2</span> Ransomware, Spyware & Adware</li>
@@ -1257,7 +785,6 @@
               </div>
             </div>
 
-            <!-- MODULE 4 -->
             <div class="curr-module" data-module="m4">
               <div class="curr-module-marker">
                 <span class="curr-marker-num">04</span>
@@ -1272,10 +799,7 @@
                   </div>
                   <span class="curr-module-count">10 chapters</span>
                 </div>
-                <p class="curr-module-desc">
-                  To defend like a professional, think like an attacker. Every technique
-                  here is performed only in isolated, owned labs.
-                </p>
+                <p class="curr-module-desc">To defend like a professional, think like an attacker. Every technique here is performed only in isolated, owned labs.</p>
                 <ul class="curr-chapter-list">
                   <li><span class="curr-ch-num">4.1</span> SQL Injection</li>
                   <li><span class="curr-ch-num">4.2</span> Cross-Site Scripting (XSS)</li>
@@ -1291,7 +815,6 @@
               </div>
             </div>
 
-            <!-- MODULE 5 -->
             <div class="curr-module" data-module="m5">
               <div class="curr-module-marker">
                 <span class="curr-marker-num">05</span>
@@ -1306,10 +829,7 @@
                   </div>
                   <span class="curr-module-count">4 chapters</span>
                 </div>
-                <p class="curr-module-desc">
-                  The defender's playbook. Spot threats before they hit, secure the
-                  systems that hold your data, and respond when something goes wrong.
-                </p>
+                <p class="curr-module-desc">The defender's playbook. Spot threats before they hit, secure the systems that hold your data, and respond when something goes wrong.</p>
                 <ul class="curr-chapter-list">
                   <li><span class="curr-ch-num">5.1</span> Threat Detection & Threat Hunting</li>
                   <li><span class="curr-ch-num">5.2</span> Securing Systems & Data</li>
@@ -1319,7 +839,6 @@
               </div>
             </div>
 
-            <!-- MODULE 6 -->
             <div class="curr-module" data-module="m6">
               <div class="curr-module-marker">
                 <span class="curr-marker-num">06</span>
@@ -1334,10 +853,7 @@
                   </div>
                   <span class="curr-module-count">3 chapters</span>
                 </div>
-                <p class="curr-module-desc">
-                  A practitioner's toolkit. Each chapter introduces one tool — what it
-                  does, when to use it, and how to read its output safely.
-                </p>
+                <p class="curr-module-desc">A practitioner's toolkit. Each chapter introduces one tool — what it does, when to use it, and how to read its output safely.</p>
                 <ul class="curr-chapter-list">
                   <li><span class="curr-ch-num">6.1</span> Nmap</li>
                   <li><span class="curr-ch-num">6.2</span> Wireshark</li>
@@ -1346,7 +862,6 @@
               </div>
             </div>
 
-            <!-- MODULE 7 -->
             <div class="curr-module" data-module="m7">
               <div class="curr-module-marker">
                 <span class="curr-marker-num">07</span>
@@ -1361,20 +876,15 @@
                   </div>
                   <span class="curr-module-count">2 chapters</span>
                 </div>
-                <p class="curr-module-desc">
-                  Everything you've learned, put to work. These projects prove your
-                  skills to employers — and to yourself.
-                </p>
+                <p class="curr-module-desc">Everything you've learned, put to work. These projects prove your skills to employers — and to yourself.</p>
                 <ul class="curr-chapter-list">
                   <li><span class="curr-ch-num">7.1</span> Home Lab Capstone Projects</li>
                   <li><span class="curr-ch-num">7.2</span> Career Paths & Next Steps</li>
                 </ul>
               </div>
             </div>
-
           </div>
 
-          <!-- CURRICULUM STATS -->
           <div class="curriculum-stats">
             <div class="curr-stat">
               <span class="curr-stat-num">49</span>
@@ -1395,11 +905,8 @@
           </div>
         </div>
 
-        <!-- ============ OUTLINE + CONTENT ============ -->
         <div id="book-outline-wrap" class="book-outline-wrap hidden">
           <div class="book-layout">
-
-            <!-- Sidebar -->
             <aside class="book-sidebar">
               <div class="book-sidebar-header">
                 <h3>Book Path</h3>
@@ -1408,18 +915,13 @@
               <div id="book-outline-list" class="outline-list"></div>
             </aside>
 
-            <!-- Content -->
             <div class="book-content-panel">
               <div id="book-content" class="book-content"></div>
             </div>
-
           </div>
         </div>
       </section>
 
-      <!-- ============================================================
-           PROFILE
-           ============================================================ -->
       <section id="page-profile" class="page">
         <h2>My Profile</h2>
         <p class="page-sub">View and update your account information.</p>
@@ -1462,9 +964,6 @@
         </div>
       </section>
 
-      <!-- ============================================================
-           ADMIN PANEL
-           ============================================================ -->
       <section id="page-admin" class="page">
         <h2>Administrator Panel</h2>
         <p class="page-sub">Full control over users, sessions and system.</p>
@@ -1481,11 +980,21 @@
           <div class="cards-grid" id="admin-stats"></div>
         </div>
 
+        <div id="admin-tab-curriculum" class="admin-tab-content">
+          <div class="admin-toolbar">
+            <button class="btn-secondary" id="btn-refresh-curriculum">Refresh</button>
+            <span class="curriculum-hint">✓ Tick each topic as you teach it. Students' progress updates automatically.</span>
+          </div>
+          <div id="curriculum-progress-list" class="curriculum-progress-list">
+            <div class="loading-msg">Loading curriculum…</div>
+          </div>
+        </div>
+
         <div id="admin-tab-users" class="admin-tab-content">
-  <div class="admin-toolbar">
-    <button class="btn-primary" id="btn-add-user">+ New User</button>
-    <button class="btn-secondary" id="btn-refresh-users">Refresh</button>
-  </div>
+          <div class="admin-toolbar">
+            <button class="btn-primary" id="btn-add-user">+ New User</button>
+            <button class="btn-secondary" id="btn-refresh-users">Refresh</button>
+          </div>
           <div class="table-wrap">
             <table class="data-table" id="users-table">
               <thead>
@@ -1493,7 +1002,7 @@
                   <th>Username</th>
                   <th>Name</th>
                   <th>Role</th>
-                  <th>Class</th>
+                  <th>Course</th>
                   <th>Email</th>
                   <th>Last Login</th>
                   <th>Actions</th>
@@ -1522,51 +1031,35 @@
         </div>
 
         <div id="admin-tab-books" class="admin-tab-content">
+          <div class="admin-toolbar">
+            <button class="btn-primary" id="bm-add-module">+ New Module</button>
+            <button class="btn-secondary" id="bm-export">Export JSON</button>
+            <button class="btn-secondary" id="bm-import">Import JSON</button>
+            <button class="btn-secondary" id="bm-reset">Reset to Default</button>
+          </div>
 
-          <div id="admin-tab-curriculum" class="admin-tab-content">
-  <div class="admin-toolbar">
-    <button class="btn-secondary" id="btn-refresh-curriculum">Refresh</button>
-    <span class="curriculum-hint">✓ Tick each topic as you teach it. Students' progress updates automatically.</span>
-  </div>
-  <div id="curriculum-progress-list" class="curriculum-progress-list">
-    <div class="loading-msg">Loading curriculum…</div>
-  </div>
-</div>
-          
-  <div class="admin-toolbar">
-    <button class="btn-primary" id="bm-add-module">+ New Module</button>
-    <button class="btn-secondary" id="bm-export">Export JSON</button>
-    <button class="btn-secondary" id="bm-import">Import JSON</button>
-    <button class="btn-secondary" id="bm-reset">Reset to Default</button>
-  </div>
+          <div class="bm-layout">
+            <aside class="bm-sidebar">
+              <div class="bm-sidebar-head">
+                <span class="bm-kicker">Structure</span>
+                <span class="bm-count" id="bm-count">0 chapters</span>
+              </div>
+              <div class="bm-tree" id="bm-tree"></div>
+            </aside>
 
-  <div class="bm-layout">
-    <!-- Left: Module/Chapter Tree -->
-    <aside class="bm-sidebar">
-      <div class="bm-sidebar-head">
-        <span class="bm-kicker">Structure</span>
-        <span class="bm-count" id="bm-count">0 chapters</span>
-      </div>
-      <div class="bm-tree" id="bm-tree"></div>
-    </aside>
-
-    <!-- Right: Editor -->
-    <main class="bm-editor" id="bm-editor">
-      <div class="bm-empty">
-        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M4 4h16v16H4z M4 9h16 M8 4v16"/>
-        </svg>
-        <p>Select a chapter from the tree to edit it</p>
-        <span>Or create a new module to begin</span>
-      </div>
-    </main>
-  </div>
-</div>
+            <main class="bm-editor" id="bm-editor">
+              <div class="bm-empty">
+                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M4 4h16v16H4z M4 9h16 M8 4v16"/>
+                </svg>
+                <p>Select a chapter from the tree to edit it</p>
+                <span>Or create a new module to begin</span>
+              </div>
+            </main>
+          </div>
+        </div>
       </section>
 
-      <!-- ============================================================
-           STUDENTS (Teacher + Admin)
-           ============================================================ -->
       <section id="page-students" class="page">
         <h2>Manage Students</h2>
         <p class="page-sub">View and edit student information.</p>
@@ -1586,9 +1079,6 @@
         </div>
       </section>
 
-      <!-- ============================================================
-           LOGS
-           ============================================================ -->
       <section id="page-logs" class="page">
         <h2>Authentication Monitoring</h2>
         <p class="page-sub">Security-relevant events recorded in real-time.</p>
@@ -1609,9 +1099,6 @@
         </div>
       </section>
 
-      <!-- ============================================================
-           TEST MATRIX
-           ============================================================ -->
       <section id="page-matrix" class="page">
         <h2>Identity Security Test Matrix</h2>
         <p class="page-sub">Mandatory test cases from the SRS.</p>
@@ -1627,68 +1114,63 @@
           </table>
         </div>
       </section>
-
     </main>
   </div>
 
-  <!-- ============================================================
-       MODALS
-       ============================================================ -->
-
   <!-- CREATE USER MODAL -->
-<div id="create-user-modal" class="modal-overlay hidden">
-  <div class="modal-card">
-    <div class="modal-head">
-      <h3>Create New User</h3>
-      <button class="modal-close" data-close-modal="create-user-modal">×</button>
+  <div id="create-user-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Create New User</h3>
+        <button class="modal-close" data-close-modal="create-user-modal">×</button>
+      </div>
+      <form id="create-user-form" class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cu-username">Username *</label>
+            <input type="text" id="cu-username" required autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label for="cu-display">Full Name *</label>
+            <input type="text" id="cu-display" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cu-email">Email</label>
+            <input type="email" id="cu-email" />
+          </div>
+          <div class="form-group">
+            <label for="cu-mobile">Mobile</label>
+            <input type="text" id="cu-mobile" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cu-role">Role *</label>
+            <select id="cu-role" required>
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="cu-course">Course <span class="hint">(students only)</span></label>
+            <input type="text" id="cu-course" placeholder="e.g., Cybersecurity Fundamentals" />
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:16px;">
+          <label for="cu-password">Password * <span class="hint">(min 6 chars)</span></label>
+          <input type="password" id="cu-password" required minlength="6" />
+        </div>
+        <div id="create-user-msg" class="error-msg hidden"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close-modal="create-user-modal">Cancel</button>
+          <button type="submit" class="btn-primary">Create User</button>
+        </div>
+      </form>
     </div>
-    <form id="create-user-form" class="modal-body">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="cu-username">Username *</label>
-          <input type="text" id="cu-username" required autocomplete="off" />
-        </div>
-        <div class="form-group">
-          <label for="cu-display">Full Name *</label>
-          <input type="text" id="cu-display" required />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="cu-email">Email</label>
-          <input type="email" id="cu-email" />
-        </div>
-        <div class="form-group">
-          <label for="cu-mobile">Mobile</label>
-          <input type="text" id="cu-mobile" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="cu-role">Role *</label>
-          <select id="cu-role" required>
-            <option value="student">Student</option>
-            <option value="teacher">Teacher</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="cu-course">Course <span class="hint">(students only)</span></label>
-          <input type="text" id="cu-course" placeholder="e.g., Cybersecurity Fundamentals" />
-        </div>
-      </div>
-      <div class="form-group" style="margin-top:16px;">
-        <label for="cu-password">Password * <span class="hint">(min 6 chars)</span></label>
-        <input type="password" id="cu-password" required minlength="6" />
-      </div>
-      <div id="create-user-msg" class="error-msg hidden"></div>
-      <div class="modal-actions">
-        <button type="button" class="btn-secondary" data-close-modal="create-user-modal">Cancel</button>
-        <button type="submit" class="btn-primary">Create User</button>
-      </div>
-    </form>
   </div>
-</div>
 
   <!-- EDIT USER MODAL -->
   <div id="edit-user-modal" class="modal-overlay hidden">
@@ -1729,7 +1211,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="eu-class">Class</label>
+            <label for="eu-class">Course</label>
             <input type="text" id="eu-class" placeholder="For students only" />
           </div>
         </div>
@@ -1768,23 +1250,23 @@
             <label for="as-marks">Total Marks</label>
             <input type="number" id="as-marks" value="10" min="1" />
           </div>
-          <div class="form-row">
-  <div class="form-group">
-    <label for="as-submission-type">Submission Type *</label>
-    <select id="as-submission-type" required>
-      <option value="text">Text (inline answer)</option>
-      <option value="link">Link (GitHub URL, etc.)</option>
-      <option value="file">File Upload (PDF, DOC)</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="as-sub-instructions">Instructions</label>
-    <input type="text" id="as-sub-instructions" placeholder="e.g., Submit GitHub repo link" />
-  </div>
-</div>
           <div class="form-group">
             <label for="as-deadline">Deadline</label>
             <input type="datetime-local" id="as-deadline" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="as-submission-type">Submission Type *</label>
+            <select id="as-submission-type" required>
+              <option value="text">Text (inline answer)</option>
+              <option value="link">Link (GitHub URL, etc.)</option>
+              <option value="file">File Upload (PDF, DOC)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="as-sub-instructions">Instructions</label>
+            <input type="text" id="as-sub-instructions" placeholder="e.g., Submit GitHub repo link" />
           </div>
         </div>
         <div class="form-group">
@@ -1881,44 +1363,42 @@
 
   <!-- ASSIGNMENT SUBMIT MODAL -->
   <div id="assignment-submit-modal" class="modal-overlay hidden">
-  <div class="modal-card">
-    <div class="modal-head">
-      <h3>Submit Assignment</h3>
-      <button class="modal-close" data-close-modal="assignment-submit-modal">×</button>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Submit Assignment</h3>
+        <button class="modal-close" data-close-modal="assignment-submit-modal">×</button>
+      </div>
+      <form id="assignment-submit-form" class="modal-body">
+        <input type="hidden" id="asub-id" />
+        <input type="hidden" id="asub-type" value="text" />
+
+        <div class="submission-hint hidden" id="asub-hint"></div>
+
+        <div class="form-group" id="asub-text-group">
+          <label>Your Answer</label>
+          <textarea id="asub-content" rows="6" placeholder="Write your answer here…"></textarea>
+        </div>
+
+        <div class="form-group hidden" id="asub-link-group">
+          <label>Submission Link</label>
+          <input type="url" id="asub-link" placeholder="https://github.com/username/repo" />
+        </div>
+
+        <div class="form-group hidden" id="asub-file-group">
+          <label>Upload File (PDF, DOC, DOCX, ZIP, TXT — Max 10 MB)</label>
+          <input type="file" id="asub-file" accept=".pdf,.doc,.docx,.zip,.txt,.png,.jpg,.jpeg" />
+          <div class="file-preview hidden" id="asub-file-preview"></div>
+        </div>
+
+        <div id="asub-msg" class="error-msg hidden"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close-modal="assignment-submit-modal">Cancel</button>
+          <button type="submit" class="btn-primary">Submit</button>
+        </div>
+      </form>
     </div>
-    <form id="assignment-submit-form" class="modal-body">
-      <input type="hidden" id="asub-id" />
-      <input type="hidden" id="asub-type" value="text" />
-
-      <div class="submission-hint hidden" id="asub-hint"></div>
-
-      <!-- Text -->
-      <div class="form-group" id="asub-text-group">
-        <label>Your Answer</label>
-        <textarea id="asub-content" rows="6" placeholder="Write your answer here…"></textarea>
-      </div>
-
-      <!-- Link -->
-      <div class="form-group hidden" id="asub-link-group">
-        <label>Submission Link</label>
-        <input type="url" id="asub-link" placeholder="https://github.com/username/repo" />
-      </div>
-
-      <!-- File -->
-      <div class="form-group hidden" id="asub-file-group">
-        <label>Upload File (PDF, DOC, DOCX, ZIP, TXT — Max 10 MB)</label>
-        <input type="file" id="asub-file" accept=".pdf,.doc,.docx,.zip,.txt,.png,.jpg,.jpeg" />
-        <div class="file-preview hidden" id="asub-file-preview"></div>
-      </div>
-
-      <div id="asub-msg" class="error-msg hidden"></div>
-      <div class="modal-actions">
-        <button type="button" class="btn-secondary" data-close-modal="assignment-submit-modal">Cancel</button>
-        <button type="submit" class="btn-primary">Submit</button>
-      </div>
-    </form>
   </div>
-</div>
+
   <!-- CREATE EXAM MODAL -->
   <div id="exam-modal" class="modal-overlay hidden">
     <div class="modal-card">
@@ -1968,28 +1448,20 @@
     </div>
   </div>
 
-  <!-- Toast Container -->
   <div id="toast-container"></div>
 
-  <!-- ============================================================
-       SCRIPTS (Order matters!)
-       ============================================================ -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
-<!-- App modules -->
-<script src="./js/supabase-client.js"></script>
-<script src="./js/auth.js"></script>
-<script src="./js/books.js"></script>          <!-- BOOK defined here -->
-<script src="./js/app.js"></script>
-<script src="./js/features-v2.js"></script>
-<script src="./js/user-management.js"></script>
-<script src="./js/data-sync.js"></script>
-<script src="./js/book-admin.js"></script>  
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/books.js"></script>
+  <script src="./js/app.js"></script>
+  <script src="./js/features-v2.js"></script>
+  <script src="./js/user-management.js"></script>
+  <script src="./js/data-sync.js"></script>
+  <script src="./js/book-admin.js"></script>
 
-  <!-- ============================================================
-       NEW 3D VAULT BACKGROUND — Three.js (r160)
-       ============================================================ -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
   <script>
   (()=>{
@@ -2012,7 +1484,6 @@
     const GOLD=new THREE.Color('#D4AF37'),WINE=new THREE.Color('#B23A48'),AMBER=new THREE.Color('#C9A227'),GLOW=new THREE.Color('#F4E4A6');
     const ADD=THREE.AdditiveBlending;
 
-    /* L2: golden particle field */
     const pg=new THREE.BufferGeometry();
     const pos=new Float32Array(MAX*3),rr=new Float32Array(MAX*4);
     for(let i=0;i<MAX;i++){pos.set([rnd(-34,34),rnd(-16,16),rnd(-18,8)],i*3);rr.set([Math.random(),Math.random(),Math.random(),Math.random()],i*4);}
@@ -2039,7 +1510,6 @@
         gl_FragColor=vec4(col,vA*(c*c*.6*uBloom+pow(c,10.)));}`});
     const particles=new THREE.Points(pg,pMat);particles.frustumCulled=false;scene.add(particles);
 
-    /* L3: wireframe shield */
     const sh=new THREE.Shape();
     sh.moveTo(-2.3,3);sh.lineTo(2.3,3);sh.lineTo(2.3,.2);
     sh.quadraticCurveTo(2.3,-1.9,0,-3);sh.quadraticCurveTo(-2.3,-1.9,-2.3,.2);sh.closePath();
@@ -2065,7 +1535,6 @@
       fragmentShader:`uniform float uG;varying vec2 vU;void main(){float d=length(vU-.5)*2.;gl_FragColor=vec4(.83,.69,.22,pow(max(1.-d,0.),2.5)*uG);}`});
     const glowPlane=new THREE.Mesh(new THREE.PlaneGeometry(16,16),gMat);glowPlane.position.z=-1.5;scene.add(glowPlane);
 
-    /* L4: data streams */
     const N=mobile?6:9,P=mobile?6:10,curves=[],lineMats=[],spd=[];
     for(let i=0;i<N;i++){
       const a=i/N*Math.PI*2+rnd(-.2,.2),sx=Math.cos(a),sy=Math.sin(a)*.6,z0=rnd(-12,-4);
@@ -2088,7 +1557,6 @@
     const packets=new THREE.Points(pk,kMat);packets.frustumCulled=false;scene.add(packets);
     const tmp=new THREE.Vector3();
 
-    /* L5: grid floor */
     const gp=[];
     for(let z=-90;z<=20;z+=4)gp.push(-70,0,z,70,0,z);
     for(let x=-70;x<=70;x+=4)gp.push(x,0,-90,x,0,20);
@@ -2098,7 +1566,6 @@
       fragmentShader:`uniform float uA;varying float vF;void main(){gl_FragColor=vec4(.83,.69,.22,uA*vF);}`});
     const grid=new THREE.LineSegments(gg,gridMat);grid.position.y=-5.5;grid.frustumCulled=false;scene.add(grid);
 
-    /* Input */
     const m={x:0,y:0,tx:0,ty:0,px:innerWidth/2,py:innerHeight/2};
     addEventListener('pointermove',e=>{m.tx=e.clientX/innerWidth*2-1;m.ty=-(e.clientY/innerHeight*2-1);m.px=e.clientX;m.py=e.clientY;},{passive:true});
     let sc=0,scL=0;
