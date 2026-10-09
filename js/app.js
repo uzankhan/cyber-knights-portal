@@ -1,5 +1,6 @@
 /* ============================================================
    Cyber Knights — Full Application Controller (Supabase)
+   Fixed: nested loadRecords bug, user-management IIFE
    ============================================================ */
 (function () {
   "use strict";
@@ -209,7 +210,7 @@
   // ============================================================
   // NAV
   // ============================================================
-   function buildNav(role) {
+  function buildNav(role) {
     const perms = {
       student: ["dashboard", "books", "records", "assignments", "quizzes", "exams", "results", "progress"],
       teacher: ["dashboard", "books", "records", "assignments", "quizzes", "exams", "results", "students", "logs"],
@@ -232,7 +233,7 @@
       b.dataset.page = id;
       b.textContent = labels[id];
       b.addEventListener("click", () => {
-                switch (id) {
+        switch (id) {
           case "logs":        loadLogs(); break;
           case "admin":       loadAdminPanel(); break;
           case "students":    loadStudentsPage(); break;
@@ -317,51 +318,55 @@
   }
 
   // ============================================================
-  // RECORDS
+  // RECORDS  (FIXED — nested function bug removed)
   // ============================================================
-  async function loadRecords() {
-
-    // Records load karne se pehle cache check
-async function loadRecords(forceRefresh = false) {
-  const cacheKey = 'ck_records_cache';
-  const cacheTTL = 5 * 60 * 1000; // 5 minutes
-  
-  if (!forceRefresh) {
-    const cached = localStorage.getItem(cacheKey);
-    if (cached) {
-      const { data, timestamp } = JSON.parse(cached);
-      if (Date.now() - timestamp < cacheTTL) {
-        renderRecords(data);
-        return;
-      }
-    }
-  }
-  
-  // Fetch fresh from Supabase
-  const { data, error } = await supabase.from('users').select('*').eq('role', 'student');
-  if (error) { console.error(error); return; }
-  
-  localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now() }));
-  renderRecords(data);
-}
+  async function loadRecords(forceRefresh = false) {
     const tb = document.querySelector("#records-table tbody");
     if (!tb) return;
     tb.innerHTML = `<tr><td colspan="5" style="text-align:center">Loading…</td></tr>`;
+
+    const cacheKey = "ck_records_cache";
+    const cacheTTL = 5 * 60 * 1000; // 5 minutes
+
+    if (!forceRefresh) {
+      try {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < cacheTTL) {
+            renderRecords(data);
+            return;
+          }
+        }
+      } catch (_) { /* ignore corrupt cache */ }
+    }
 
     const r = await window.CK.listRecords();
     if (!r.ok) {
       tb.innerHTML = `<tr><td colspan="5" style="text-align:center">Error loading records</td></tr>`;
       return;
     }
-    if (!r.data.length) {
+
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify({ data: r.data, timestamp: Date.now() }));
+    } catch (_) { /* ignore quota errors */ }
+
+    renderRecords(r.data);
+  }
+
+  function renderRecords(data) {
+    const tb = document.querySelector("#records-table tbody");
+    if (!tb) return;
+
+    if (!data || !data.length) {
       tb.innerHTML = `<tr><td colspan="5" style="text-align:center">No records</td></tr>`;
       return;
     }
-    tb.innerHTML = r.data.map((rec) => `
+    tb.innerHTML = data.map((rec) => `
       <tr>
-        <td>${escapeHtml(rec.student_code)}</td>
-        <td>${escapeHtml(rec.name)}</td>
-        <td>${escapeHtml(rec.class_name)}</td>
+        <td>${escapeHtml(rec.student_code || "—")}</td>
+        <td>${escapeHtml(rec.name || "—")}</td>
+        <td>${escapeHtml(rec.class_name || "—")}</td>
         <td>${escapeHtml(rec.attendance || "—")}</td>
         <td>${escapeHtml(rec.status || "Active")}</td>
       </tr>
@@ -403,6 +408,9 @@ async function loadRecords(forceRefresh = false) {
     const submissions = {};
     if (sRes.ok) sRes.data.forEach((s) => { submissions[s.assignment_id] = s; });
 
+    // Expose for the modal to look up submission_type
+    window.__currentAssignments = myAssignments;
+
     wrap.innerHTML = myAssignments.map((a) => {
       const sub = submissions[a.id];
       const now = Date.now();
@@ -434,7 +442,16 @@ async function loadRecords(forceRefresh = false) {
     });
   }
 
-  function openAssignmentSubmit(aid) {
+  async function openAssignmentSubmit(aid) {
+    // Fetch assignment to get submission_type
+    const assignment = (window.__currentAssignments || []).find((a) => a.id == aid);
+
+    // If features-v2 loaded, use its enhanced version
+    if (window.CKFeaturesV2 && typeof window.CKFeaturesV2.prepSubmitModal === "function") {
+      return window.CKFeaturesV2.prepSubmitModal(aid);
+    }
+
+    // Fallback — v1 behaviour
     document.getElementById("asub-id").value = aid;
     document.getElementById("asub-content").value = "";
     document.getElementById("asub-msg").classList.add("hidden");
@@ -458,6 +475,7 @@ async function loadRecords(forceRefresh = false) {
     toast("Assignment submitted!", "success");
     closeModal("assignment-submit-modal");
     loadStudentAssignments();
+    window.dispatchEvent(new CustomEvent("ck:activity-completed"));
   }
 
   async function loadAdminAssignments() {
@@ -480,6 +498,7 @@ async function loadRecords(forceRefresh = false) {
     }
 
     allProfilesCache = pRes.ok ? pRes.data : [];
+    window.__currentAssignments = aRes.data;
 
     wrap.innerHTML = aRes.data.map((a) => {
       const assignedCount = (a.assigned_to || []).length;
@@ -509,6 +528,12 @@ async function loadRecords(forceRefresh = false) {
   }
 
   async function viewAssignmentSubmissions(aid) {
+    // Prefer v2 enhanced review
+    if (window.CKFeaturesV2 && typeof window.CKFeaturesV2.viewSubmissionsWithReview === "function") {
+      return window.CKFeaturesV2.viewSubmissionsWithReview(aid);
+    }
+
+    // Fallback — prompt-based
     const r = await window.CK.listAllSubmissions(aid);
     if (!r.ok || !r.data.length) { toast("No submissions yet", "info"); return; }
 
@@ -540,6 +565,10 @@ async function loadRecords(forceRefresh = false) {
     document.getElementById("as-desc").value = "";
     document.getElementById("as-marks").value = 10;
     document.getElementById("as-deadline").value = "";
+    const st = document.getElementById("as-submission-type");
+    if (st) st.value = "text";
+    const si = document.getElementById("as-sub-instructions");
+    if (si) si.value = "";
     document.getElementById("assignment-msg").classList.add("hidden");
     populateStudentCheckboxes("#as-students-list");
     openModal("assignment-modal");
@@ -582,6 +611,8 @@ async function loadRecords(forceRefresh = false) {
     const total_marks = parseInt(document.getElementById("as-marks").value) || 10;
     const deadline = document.getElementById("as-deadline").value;
     const assigned_to = getChecked("#as-students-list");
+    const submission_type = document.getElementById("as-submission-type")?.value || "text";
+    const submission_instructions = document.getElementById("as-sub-instructions")?.value.trim() || null;
 
     if (!title) { msgEl.textContent = "Title required"; msgEl.classList.remove("hidden"); return; }
     if (!deadline) { msgEl.textContent = "Deadline required"; msgEl.classList.remove("hidden"); return; }
@@ -591,6 +622,7 @@ async function loadRecords(forceRefresh = false) {
       title, description, total_marks,
       deadline: new Date(deadline).toISOString(),
       assigned_to, status: "Open",
+      submission_type, submission_instructions,
     });
 
     if (!r.ok) {
@@ -691,9 +723,9 @@ async function loadRecords(forceRefresh = false) {
       });
     });
 
-    document.getElementById("quiz-review-body").classList.add("hidden");
-    document.getElementById("quiz-result-body").classList.add("hidden");
-    document.getElementById("quiz-attempt-body").classList.remove("hidden");
+    document.getElementById("quiz-review-body")?.classList.add("hidden");
+    document.getElementById("quiz-result-body")?.classList.add("hidden");
+    document.getElementById("quiz-attempt-body")?.classList.remove("hidden");
 
     startQuizTimer();
     openModal("quiz-attempt-modal");
@@ -710,7 +742,7 @@ async function loadRecords(forceRefresh = false) {
       if (quizAttempt.secondsLeft <= 0) {
         clearInterval(quizAttempt.timer);
         toast("Time's up! Auto-submitting…", "error");
-        handleQuizReview();
+        finalizeQuiz();
         return;
       }
       quizAttempt.secondsLeft--;
@@ -719,23 +751,9 @@ async function loadRecords(forceRefresh = false) {
     quizAttempt.timer = setInterval(tick, 1000);
   }
 
-  function handleQuizReview() {
-    if (quizAttempt.timer) clearInterval(quizAttempt.timer);
-    const review = quizAttempt.questions.map((q, i) => {
-      const ans = quizAttempt.answers[String(q.id)] || "—";
-      return `<div class="quiz-review-item">
-        <div class="quiz-review-q"><strong>Q${i + 1}.</strong> ${escapeHtml(q.question_text)}</div>
-        <div class="quiz-review-a">Your answer: <strong>${ans}</strong></div>
-      </div>`;
-    }).join("");
-
-    document.getElementById("quiz-review-list").innerHTML = review;
-    document.getElementById("quiz-attempt-body").classList.add("hidden");
-    document.getElementById("quiz-result-body").classList.add("hidden");
-    document.getElementById("quiz-review-body").classList.remove("hidden");
-  }
-
   async function finalizeQuiz() {
+    if (quizAttempt.timer) clearInterval(quizAttempt.timer);
+
     let score = 0, total = 0;
     quizAttempt.questions.forEach((q) => {
       total += q.marks;
@@ -750,6 +768,27 @@ async function loadRecords(forceRefresh = false) {
     );
 
     if (!r.ok) { toast("Submit failed", "error"); return; }
+
+    // Save detailed attempt for report card
+    try {
+      const submissionId = r.data?.id;
+      if (submissionId) {
+        const details = quizAttempt.questions.map((q) => {
+          const given = (quizAttempt.answers[String(q.id)] || "").toUpperCase();
+          const isCorrect = given === (q.correct_option || "").toUpperCase();
+          return {
+            submission_id: submissionId,
+            question_id: q.id,
+            selected_option: given || null,
+            correct_option: q.correct_option,
+            is_correct: isCorrect,
+            marks_awarded: isCorrect ? (q.marks || 1) : 0,
+            marks_possible: q.marks || 1,
+          };
+        });
+        await window.CK.supabase.from("quiz_attempt_details").insert(details);
+      }
+    } catch (e) { console.warn("Detail save failed:", e); }
 
     const pct = total > 0 ? Math.round((score / total) * 100) : 0;
     const pass = pct >= 40;
@@ -777,9 +816,12 @@ async function loadRecords(forceRefresh = false) {
     }).join("");
 
     await window.CK.logEvent("Quiz Submitted", "Quiz", "SUCCESS", `Score: ${score}/${total}`);
-    document.getElementById("quiz-review-body").classList.add("hidden");
-    document.getElementById("quiz-attempt-body").classList.add("hidden");
-    document.getElementById("quiz-result-body").classList.remove("hidden");
+
+    document.getElementById("quiz-review-body")?.classList.add("hidden");
+    document.getElementById("quiz-attempt-body")?.classList.add("hidden");
+    document.getElementById("quiz-result-body")?.classList.remove("hidden");
+
+    window.dispatchEvent(new CustomEvent("ck:activity-completed"));
   }
 
   async function loadAdminQuizzes() {
@@ -1132,6 +1174,11 @@ async function loadRecords(forceRefresh = false) {
         `<div><span>Pass:</span> ${qPass} · <span>Fail:</span> ${qFail}</div>`) +
       card("Exams", "📚", { earned: eEarned, possible: ePossible, total: myExams.length, attended: eAttended },
         `<div><span>Pass:</span> ${ePass} · <span>Fail:</span> ${eFail}</div>`);
+
+    // Trigger v2 enhancement (curriculum tracking)
+    if (window.CKFeaturesV2 && typeof window.CKFeaturesV2.enhanceStudentProgress === "function") {
+      setTimeout(() => window.CKFeaturesV2.enhanceStudentProgress(), 100);
+    }
   }
 
   // ============================================================
@@ -1169,7 +1216,6 @@ async function loadRecords(forceRefresh = false) {
       return;
     }
 
-    // Refresh current user
     const fresh = await window.CK.getCurrentUser();
     if (fresh) {
       currentUser = fresh;
@@ -1197,6 +1243,9 @@ async function loadRecords(forceRefresh = false) {
 
         if (tab.dataset.tab === "users") loadUsers();
         if (tab.dataset.tab === "sessions") loadSessions();
+        if (tab.dataset.tab === "curriculum" && window.CKFeaturesV2) {
+          window.CKFeaturesV2.loadCurriculumProgress();
+        }
       });
     });
   }
@@ -1327,7 +1376,6 @@ async function loadRecords(forceRefresh = false) {
   async function loadSessions() {
     const tb = document.querySelector("#sessions-table tbody");
     if (!tb) return;
-    // Supabase mein server-side sessions table nahi — placeholder
     tb.innerHTML = `
       <tr><td colspan="8" style="text-align:center;color:var(--text-lo)">
         Current session: ${escapeHtml(currentUser.username)} (${escapeHtml(currentUser.role)})
@@ -1335,7 +1383,7 @@ async function loadRecords(forceRefresh = false) {
   }
 
   // ============================================================
-  // STUDENTS PAGE (Teacher + Admin)
+  // STUDENTS PAGE
   // ============================================================
   async function loadStudentsPage() {
     const tb = document.querySelector("#teacher-students-table tbody");
@@ -1447,7 +1495,6 @@ async function loadRecords(forceRefresh = false) {
   function init() {
     console.log("[CK] Initializing app…");
 
-    // Login
     const loginForm = document.getElementById("login-form");
     if (loginForm) loginForm.addEventListener("submit", handleLogin);
 
@@ -1459,20 +1506,16 @@ async function loadRecords(forceRefresh = false) {
       });
     }
 
-    // Logout
     const logoutBtn = document.getElementById("btn-logout");
     if (logoutBtn) logoutBtn.addEventListener("click", handleLogout);
 
-    // Profile icon
     const profIcon = document.getElementById("btn-profile-icon");
     if (profIcon) profIcon.addEventListener("click", () => {
       if (currentUser) { loadProfile(); showPage("profile"); }
     });
 
-    // Admin tabs
     setupAdminTabs();
 
-    // Global modal close
     document.addEventListener("click", (e) => {
       const closeBtn = e.target.closest("[data-close-modal]");
       if (closeBtn) {
@@ -1503,7 +1546,6 @@ async function loadRecords(forceRefresh = false) {
       }
     });
 
-    // Forms
     const pf = document.getElementById("profile-form");
     if (pf) pf.addEventListener("submit", handleProfileSubmit);
 
@@ -1519,27 +1561,24 @@ async function loadRecords(forceRefresh = false) {
     const ef = document.getElementById("exam-form");
     if (ef) ef.addEventListener("submit", handleCreateExam);
 
+    // Assignment submit form — v2 will attach its own handler if needed
     const asub = document.getElementById("assignment-submit-form");
-    if (asub) asub.addEventListener("submit", handleAssignmentSubmit);
-
-    // Quiz attempt buttons
-    const qSubmit = document.getElementById("btn-quiz-submit");
-    if (qSubmit) qSubmit.addEventListener("click", handleQuizReview);
+    if (asub && !asub.dataset.v2handled) {
+      asub.addEventListener("submit", handleAssignmentSubmit);
+    }
 
     const qBack = document.getElementById("btn-quiz-back");
     if (qBack) qBack.addEventListener("click", () => {
-      document.getElementById("quiz-review-body").classList.add("hidden");
-      document.getElementById("quiz-attempt-body").classList.remove("hidden");
+      document.getElementById("quiz-review-body")?.classList.add("hidden");
+      document.getElementById("quiz-attempt-body")?.classList.remove("hidden");
     });
 
     const qFin = document.getElementById("btn-quiz-finalize");
     if (qFin) qFin.addEventListener("click", finalizeQuiz);
 
-    // Add question button
     const addQ = document.getElementById("btn-add-question");
     if (addQ) addQ.addEventListener("click", addQuizQuestion);
 
-    // Toolbar buttons
     bindClick("btn-create-assignment", openCreateAssignmentModal);
     bindClick("btn-admin-create-assignment", openCreateAssignmentModal);
     bindClick("btn-create-quiz", openCreateQuizModal);
@@ -1553,7 +1592,6 @@ async function loadRecords(forceRefresh = false) {
     bindClick("btn-refresh-exams", loadExamsPage);
     bindClick("btn-admin-refresh-exams", loadExamsPage);
 
-    // Logs
     bindClick("btn-clear-logs", async () => {
       if (!confirm("Clear all logs?")) return;
       const r = await window.CK.clearLogs();
@@ -1572,7 +1610,6 @@ async function loadRecords(forceRefresh = false) {
       URL.revokeObjectURL(url);
     });
 
-    // Auto-login
     if (window.CK) {
       window.CK.getCurrentUser().then((user) => {
         if (user) {
@@ -1595,10 +1632,8 @@ async function loadRecords(forceRefresh = false) {
     if (el) el.addEventListener("click", fn);
   }
 
-  // Expose for testing
   window.CKApp = { showPage, loadAdminPanel, loadLogs, loadTestMatrix };
 
-  // Boot
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
   } else {
@@ -1606,16 +1641,9 @@ async function loadRecords(forceRefresh = false) {
   }
 
   /* ============================================================
-   Add New User Handler (Admin)
-   ============================================================ */
-(function () {
-  "use strict";
-
-  const $ = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-
+     ADD NEW USER — Admin
+     ============================================================ */
   function openCreateUserModal() {
-    // Check if modal already exists, else create it
     let modal = document.getElementById('create-user-modal');
     if (!modal) {
       modal = document.createElement('div');
@@ -1677,7 +1705,7 @@ async function loadRecords(forceRefresh = false) {
       document.body.appendChild(modal);
     }
     modal.classList.remove('hidden');
-    document.getElementById('cu-username').focus();
+    setTimeout(() => document.getElementById('cu-username')?.focus(), 50);
   }
 
   function closeCreateUserModal() {
@@ -1710,81 +1738,34 @@ async function loadRecords(forceRefresh = false) {
     }
 
     try {
-      // Try to use existing admin API if available
-      let created = false;
-
-      if (window.CKAdmin && typeof window.CKAdmin.createUser === 'function') {
-        await window.CKAdmin.createUser({
-          username, displayName, email, mobile, role, class: klass, password
+      // Use CK API — this handles Supabase auth + profile creation
+      if (window.CK && typeof window.CK.createUser === 'function') {
+        const r = await window.CK.createUser({
+          username, display_name: displayName, email, mobile, role,
+          class_name: klass, password,
         });
-        created = true;
-      } else if (window.CKAuth && typeof window.CKAuth.createUser === 'function') {
-        await window.CKAuth.createUser({
-          username, displayName, email, mobile, role, class: klass, password
-        });
-        created = true;
-      } else if (typeof window.createUser === 'function') {
-        await window.createUser({
-          username, displayName, email, mobile, role, class: klass, password
-        });
-        created = true;
+        if (!r.ok) throw new Error(r.error || 'Creation failed');
       } else {
-        // Fallback: store in localStorage-based user store
-        const users = JSON.parse(localStorage.getItem('ck_users') || '[]');
-        if (users.some(u => u.username === username)) {
-          throw new Error('Username already exists');
-        }
-        users.push({
-          username, displayName, email, mobile, role,
-          class: klass, password,
-          createdAt: new Date().toISOString()
-        });
-        localStorage.setItem('ck_users', JSON.stringify(users));
-        created = true;
+        throw new Error('CK.createUser is not available. Please reload.');
       }
 
-      if (created) {
-        closeCreateUserModal();
-        if (typeof window.refreshUsersTable === 'function') {
-          window.refreshUsersTable();
-        } else if (typeof window.loadUsers === 'function') {
-          window.loadUsers();
-        } else {
-          // Fallback: click refresh button
-          document.getElementById('btn-refresh-users')?.click();
-        }
-        // Toast notification
-        const t = document.createElement('div');
-        t.className = 'toast success';
-        t.textContent = `User "${username}" created successfully`;
-        document.getElementById('toast-container')?.appendChild(t);
-        setTimeout(() => t.remove(), 3000);
-      }
+      closeCreateUserModal();
+      toast(`User "${username}" created`, 'success');
+      if (typeof loadUsers === 'function') loadUsers();
+      if (typeof loadAdminStats === 'function') loadAdminStats();
+
     } catch (err) {
       msg.textContent = err.message || 'Failed to create user.';
       msg.classList.remove('hidden');
     }
   }
 
-  // Attach listeners when DOM ready
-  function attachListeners() {
+  function attachCreateUserListeners() {
     const addBtn = document.getElementById('btn-add-user');
     if (addBtn && !addBtn.dataset.bound) {
       addBtn.addEventListener('click', openCreateUserModal);
       addBtn.dataset.bound = 'true';
     }
-
-    // Global click for modal close
-    document.addEventListener('click', (e) => {
-      if (e.target.closest('[data-close-modal="create-user-modal"]')) {
-        closeCreateUserModal();
-      }
-      if (e.target.id === 'create-user-modal') {
-        closeCreateUserModal();
-      }
-    });
-
-    // Form submit
     const form = document.getElementById('create-user-form');
     if (form && !form.dataset.bound) {
       form.addEventListener('submit', handleCreateUser);
@@ -1792,14 +1773,15 @@ async function loadRecords(forceRefresh = false) {
     }
   }
 
-  // Wait for DOM
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', attachListeners);
-  } else {
-    attachListeners();
-  }
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-close-modal="create-user-modal"]')) closeCreateUserModal();
+    if (e.target.id === 'create-user-modal') closeCreateUserModal();
+  });
 
-  // Re-attach when admin tab opens (in case DOM reloads)
-  setInterval(attachListeners, 2000);
-})();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachCreateUserListeners);
+  } else {
+    attachCreateUserListeners();
+  }
+  setInterval(attachCreateUserListeners, 2000);
 })();
