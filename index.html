@@ -927,18 +927,33 @@
            RESULTS
            ============================================================ -->
       <section id="page-results" class="page">
-        <h2>Examination Results</h2>
-        <p class="page-sub">Latest exam scores.</p>
-        <div class="table-wrap">
-          <table class="data-table" id="results-table">
-            <thead>
-              <tr><th>Student</th><th>Exam</th><th>Score</th><th>Total</th><th>Grade</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </section>
+  <h2>Examination Results</h2>
+  <p class="page-sub">Latest exam scores.</p>
 
+  <!-- NEW: Results Tabs -->
+  <div class="results-tabs">
+    <button class="results-tab active" data-rtab="exams">Exam Results</button>
+    <button class="results-tab" data-rtab="report">My Report Card</button>
+  </div>
+
+  <!-- Existing Exam View -->
+  <div id="results-exams-view">
+    <div class="table-wrap">
+      <table class="data-table" id="results-table">
+        <thead>
+          <tr><th>Student</th><th>Exam</th><th>Score</th><th>Total</th><th>Grade</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- NEW: Report Card View -->
+  <div id="results-report-view" class="hidden">
+    <div id="report-card-summary"></div>
+    <div id="report-card-detail"></div>
+  </div>
+</section>
       <!-- ============================================================
            PROGRESS
            ============================================================ -->
@@ -1456,6 +1471,7 @@
 
         <div class="admin-tabs">
           <button class="admin-tab active" data-tab="overview">Overview</button>
+          <button class="admin-tab" data-tab="curriculum">Curriculum Progress</button>
           <button class="admin-tab" data-tab="users">Users</button>
           <button class="admin-tab" data-tab="sessions">Active Sessions</button>
           <button class="admin-tab" data-tab="books">Book Manager</button>
@@ -1506,6 +1522,17 @@
         </div>
 
         <div id="admin-tab-books" class="admin-tab-content">
+
+          <div id="admin-tab-curriculum" class="admin-tab-content">
+  <div class="admin-toolbar">
+    <button class="btn-secondary" id="btn-refresh-curriculum">Refresh</button>
+    <span class="curriculum-hint">✓ Tick each topic as you teach it. Students' progress updates automatically.</span>
+  </div>
+  <div id="curriculum-progress-list" class="curriculum-progress-list">
+    <div class="loading-msg">Loading curriculum…</div>
+  </div>
+</div>
+          
   <div class="admin-toolbar">
     <button class="btn-primary" id="bm-add-module">+ New Module</button>
     <button class="btn-secondary" id="bm-export">Export JSON</button>
@@ -1741,6 +1768,20 @@
             <label for="as-marks">Total Marks</label>
             <input type="number" id="as-marks" value="10" min="1" />
           </div>
+          <div class="form-row">
+  <div class="form-group">
+    <label for="as-submission-type">Submission Type *</label>
+    <select id="as-submission-type" required>
+      <option value="text">Text (inline answer)</option>
+      <option value="link">Link (GitHub URL, etc.)</option>
+      <option value="file">File Upload (PDF, DOC)</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="as-sub-instructions">Instructions</label>
+    <input type="text" id="as-sub-instructions" placeholder="e.g., Submit GitHub repo link" />
+  </div>
+</div>
           <div class="form-group">
             <label for="as-deadline">Deadline</label>
             <input type="datetime-local" id="as-deadline" />
@@ -1840,26 +1881,44 @@
 
   <!-- ASSIGNMENT SUBMIT MODAL -->
   <div id="assignment-submit-modal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3>Submit Assignment</h3>
-        <button class="modal-close" data-close-modal="assignment-submit-modal">×</button>
-      </div>
-      <form id="assignment-submit-form" class="modal-body">
-        <input type="hidden" id="asub-id" />
-        <div class="form-group">
-          <label>Your Answer / Submission</label>
-          <textarea id="asub-content" rows="6" placeholder="Write your answer here..." required></textarea>
-        </div>
-        <div id="asub-msg" class="error-msg hidden"></div>
-        <div class="modal-actions">
-          <button type="button" class="btn-secondary" data-close-modal="assignment-submit-modal">Cancel</button>
-          <button type="submit" class="btn-primary">Submit</button>
-        </div>
-      </form>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>Submit Assignment</h3>
+      <button class="modal-close" data-close-modal="assignment-submit-modal">×</button>
     </div>
-  </div>
+    <form id="assignment-submit-form" class="modal-body">
+      <input type="hidden" id="asub-id" />
+      <input type="hidden" id="asub-type" value="text" />
 
+      <div class="submission-hint hidden" id="asub-hint"></div>
+
+      <!-- Text -->
+      <div class="form-group" id="asub-text-group">
+        <label>Your Answer</label>
+        <textarea id="asub-content" rows="6" placeholder="Write your answer here…"></textarea>
+      </div>
+
+      <!-- Link -->
+      <div class="form-group hidden" id="asub-link-group">
+        <label>Submission Link</label>
+        <input type="url" id="asub-link" placeholder="https://github.com/username/repo" />
+      </div>
+
+      <!-- File -->
+      <div class="form-group hidden" id="asub-file-group">
+        <label>Upload File (PDF, DOC, DOCX, ZIP, TXT — Max 10 MB)</label>
+        <input type="file" id="asub-file" accept=".pdf,.doc,.docx,.zip,.txt,.png,.jpg,.jpeg" />
+        <div class="file-preview hidden" id="asub-file-preview"></div>
+      </div>
+
+      <div id="asub-msg" class="error-msg hidden"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" data-close-modal="assignment-submit-modal">Cancel</button>
+        <button type="submit" class="btn-primary">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
   <!-- CREATE EXAM MODAL -->
   <div id="exam-modal" class="modal-overlay hidden">
     <div class="modal-card">
@@ -1923,6 +1982,7 @@
 <script src="./js/auth.js"></script>
 <script src="./js/books.js"></script>          <!-- BOOK defined here -->
 <script src="./js/app.js"></script>
+<script src="./js/features-v2.js"></script>
 <script src="./js/user-management.js"></script>
 <script src="./js/data-sync.js"></script>
 <script src="./js/book-admin.js"></script>  
