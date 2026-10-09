@@ -2463,4 +2463,367 @@ body::after {
   .tool-row.tool-header { display: none; }
   .career-head { flex-direction: column; align-items: flex-start; }
   .career-salary { align-self: flex-start; }
+
+
+   /* ============================================================
+   FEATURES V2 — Progress, Report Card, Assignment Types
+   ============================================================ */
+
+/* ---------- Results Tabs ---------- */
+.results-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 1.5px solid rgba(212, 175, 55, 0.15);
+}
+.results-tab {
+  background: none; border: none;
+  padding: 12px 20px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-lo); cursor: pointer;
+  position: relative; text-transform: uppercase;
+  transition: color 0.25s;
+}
+.results-tab:hover { color: var(--text-hi); }
+.results-tab.active { color: #D4AF37; }
+.results-tab.active::after {
+  content: '';
+  position: absolute; bottom: -1.5px; left: 0; right: 0;
+  height: 2.5px; background: #D4AF37;
+  box-shadow: 0 0 12px #D4AF37;
+}
+
+/* ---------- Report Card ---------- */
+.report-summary-card {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; margin-bottom: 24px;
+}
+@media (max-width: 600px) {
+  .report-summary-card { grid-template-columns: 1fr; }
+}
+.report-stat {
+  background: rgba(46, 17, 32, 0.4);
+  border: 1.5px solid rgba(212, 175, 55, 0.2);
+  border-radius: 14px;
+  padding: 24px; text-align: center;
+  transition: all 0.3s ease;
+}
+.report-stat:hover {
+  border-color: rgba(212, 175, 55, 0.4);
+  transform: translateY(-3px);
+}
+.report-stat-num {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 2.4rem; font-weight: 600;
+  color: #D4AF37; letter-spacing: -0.03em;
+  line-height: 1;
+  text-shadow: 0 0 24px rgba(212, 175, 55, 0.3);
+}
+.report-stat-label {
+  display: block; margin-top: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.15em;
+  color: var(--text-lo); text-transform: uppercase;
+}
+
+/* ---------- Badges ---------- */
+.badge {
+  display: inline-block; padding: 3px 10px;
+  border-radius: 8px; font-size: 10px;
+  font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.badge-quiz { background: rgba(212, 175, 55, 0.15); color: #D4AF37; border: 1px solid rgba(212, 175, 55, 0.3); }
+.badge-assignment { background: rgba(178, 58, 72, 0.15); color: #E8A0AA; border: 1px solid rgba(178, 58, 72, 0.3); }
+.badge-exam { background: rgba(201, 162, 39, 0.15); color: #C9A227; border: 1px solid rgba(201, 162, 39, 0.3); }
+
+/* ---------- Curriculum Progress ---------- */
+.curriculum-hint {
+  font-size: 12px; color: var(--text-lo);
+  margin-left: auto; align-self: center;
+}
+.curriculum-progress-list {
+  display: flex; flex-direction: column; gap: 20px;
+}
+.curriculum-module {
+  background: rgba(46, 17, 32, 0.4);
+  border: 1.5px solid rgba(212, 175, 55, 0.18);
+  border-radius: 14px;
+  padding: 20px 24px;
+  transition: all 0.3s ease;
+}
+.curriculum-module:hover {
+  border-color: rgba(212, 175, 55, 0.35);
+}
+.curriculum-module-head {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+}
+.curriculum-module-icon {
+  font-size: 1.6rem;
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 11px;
+  background: rgba(212, 175, 55, 0.06);
+  flex-shrink: 0;
+}
+.curriculum-module-head h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  color: var(--text-hi);
+  margin: 0 0 4px;
+}
+.curriculum-module-meta {
+  font-size: 11.5px; color: var(--text-lo);
+  font-family: 'JetBrains Mono', monospace;
+}
+.curriculum-chapter-list {
+  list-style: none; display: grid; gap: 6px;
+}
+.curriculum-chapter-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
+.curriculum-chapter-item:hover {
+  background: rgba(212, 175, 55, 0.04);
+}
+.curriculum-chapter-item.taught {
+  background: rgba(212, 175, 55, 0.06);
+  border-left-color: #D4AF37;
+}
+.curriculum-checkbox {
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; flex: 1;
+}
+.curriculum-checkbox input[type=checkbox] {
+  width: 18px; height: 18px;
+  accent-color: #D4AF37;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.curriculum-chapter-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: #D4AF37;
+  min-width: 40px;
+}
+.curriculum-chapter-title {
+  font-size: 13px; color: var(--text-md);
+}
+.curriculum-chapter-item.taught .curriculum-chapter-title {
+  color: var(--text-hi);
+}
+.curriculum-taught-date {
+  font-size: 10.5px; color: var(--text-lo);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ---------- Student Progress ---------- */
+.chapter-progress-list {
+  list-style: none; margin-top: 12px;
+  display: grid; gap: 4px;
+}
+.chapter-progress-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-lo);
+  transition: all 0.2s;
+}
+.chapter-progress-item.taught {
+  color: var(--text-md);
+  background: rgba(212, 175, 55, 0.04);
+}
+.chapter-tick {
+  width: 18px; text-align: center;
+  font-weight: 700; font-size: 14px;
+}
+.chapter-tick.tick-done { color: #D4AF37; }
+.chapter-tick.tick-pending { color: rgba(212, 197, 168, 0.35); }
+.chapter-progress-item .chapter-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; color: #D4AF37;
+  min-width: 40px;
+}
+.own-progress {
+  margin-left: auto;
+  font-size: 10px; padding: 2px 8px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 10px; color: #D4AF37;
+}
+.progress-card.completed {
+  border-color: rgba(212, 175, 55, 0.5);
+}
+.progress-card-badge {
+  padding: 3px 10px;
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 10px;
+  font-size: 10px; font-weight: 700;
+  color: #D4AF37; text-transform: uppercase;
+  margin-left: auto;
+}
+.progress-card-head {
+  display: flex; align-items: center;
+  gap: 12px; margin-bottom: 12px;
+}
+.progress-card-icon {
+  font-size: 1.4rem;
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 10px;
+  background: rgba(212, 175, 55, 0.05);
+  flex-shrink: 0;
+}
+.progress-card-info h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-hi);
+  margin: 0 0 4px;
+}
+.progress-card-meta {
+  font-size: 11px;
+  color: var(--text-lo);
+  font-family: 'JetBrains Mono', monospace;
+}
+.progress-bar-wrap.small {
+  height: 6px;
+  margin: 12px 0;
+}
+
+/* ---------- Submission Review ---------- */
+.submission-review-card {
+  border: 1.5px solid rgba(212, 175, 55, 0.15);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  background: rgba(46, 17, 32, 0.4);
+}
+.sub-review-head {
+  display: flex; align-items: center;
+  gap: 12px; margin-bottom: 10px;
+}
+.sub-review-head strong {
+  font-size: 14px;
+  color: var(--text-hi);
+}
+.sub-status {
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.status-pending { background: rgba(201, 162, 39, 0.15); color: #C9A227; }
+.status-accepted { background: rgba(212, 175, 55, 0.15); color: #D4AF37; }
+.status-rejected { background: rgba(178, 58, 72, 0.15); color: #E8A0AA; }
+.sub-marks {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: #D4AF37;
+}
+.sub-review-content {
+  padding: 10px 14px;
+  background: rgba(26, 8, 16, 0.5);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--text-md);
+  word-break: break-word;
+}
+.sub-review-actions {
+  display: flex; gap: 8px;
+  flex-wrap: wrap; align-items: center;
+}
+.sub-marks-input { width: 80px !important; padding: 8px 10px !important; }
+.sub-feedback-input { flex: 1; min-width: 180px; padding: 8px 10px !important; }
+.btn-sm {
+  padding: 8px 16px !important;
+  font-size: 11px !important;
+  width: auto !important;
+}
+.sub-link, .sub-file-link {
+  color: #D4AF37;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+/* ---------- File Upload Preview ---------- */
+.file-preview {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: rgba(212, 175, 55, 0.06);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-md);
+}
+.submission-hint {
+  padding: 10px 14px;
+  background: rgba(201, 162, 39, 0.08);
+  border-left: 3px solid #C9A227;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 12.5px;
+  color: var(--text-md);
+}
+
+/* ---------- Quiz Detail Modal ---------- */
+.quiz-detail-item {
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: rgba(26, 8, 16, 0.5);
+  border-left: 3px solid var(--border-neutral);
+}
+.quiz-detail-item.correct {
+  border-left-color: #D4AF37;
+  background: rgba(212, 175, 55, 0.05);
+}
+.quiz-detail-item.wrong {
+  border-left-color: #B23A48;
+  background: rgba(178, 58, 72, 0.05);
+}
+.quiz-detail-q {
+  font-size: 13.5px;
+  margin-bottom: 8px;
+  color: var(--text-hi);
+}
+.quiz-detail-answers {
+  display: flex; gap: 12px;
+  flex-wrap: wrap; font-size: 12px;
+}
+.detail-label {
+  color: var(--text-lo);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  text-transform: uppercase;
+}
+.your-answer { color: var(--text-hi); }
+.correct-answer { color: #D4AF37; font-weight: 600; }
+.quiz-detail-marks {
+  margin-top: 6px; font-size: 11.5px;
+  color: var(--text-lo);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ---------- Loaders ---------- */
+.loading-msg, .empty-msg {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-lo);
+  font-size: 13px;
+}
 }
