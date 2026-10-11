@@ -139,15 +139,20 @@
   }
 
   // ============================================================
-  // FEATURE 1b: STUDENT PROGRESS VIEW ENHANCEMENT
+  // FEATURE 1b: STUDENT PROGRESS — COURSE OVERVIEW + MODULE CARDS
   // ============================================================
   async function enhanceStudentProgress() {
+    const summary = $('#progress-summary');
     const container = $('#progress-breakdown');
-    if (!container || !sb()) return;
+    if (!summary || !sb()) return;
 
     const u = user();
     if (!u || u.role !== 'student') return;
 
+    // Remove any previous enhancement to prevent duplicates
+    document.getElementById('student-course-progress')?.remove();
+
+    // Load taught topics
     const { data: taught } = await sb().from('taught_topics').select('*');
     const taughtMap = {};
     (taught || []).forEach(t => { taughtMap[t.chapter_id] = t; });
@@ -156,6 +161,17 @@
     const sections = bookData?.sections || [];
     if (!sections.length) return;
 
+    // === OVERALL STATS ===
+    let totalChapters = 0;
+    let totalTaught = 0;
+    sections.forEach(s => {
+      totalChapters += s.chapters.length;
+      totalTaught += s.chapters.filter(c => taughtMap[c.id]).length;
+    });
+    const overallPct = totalChapters ? Math.round((totalTaught / totalChapters) * 100) : 0;
+    const remaining = totalChapters - totalTaught;
+
+    // === MODULE CARDS ===
     const moduleCards = sections.map(section => {
       const isFront = section.type === 'matter';
       const label = isFront ? 'Front Matter' : `Module ${String(section.number).padStart(2, '0')}`;
@@ -175,14 +191,16 @@
       }).join('');
 
       return `
-        <div class="progress-card ${pct === 100 ? 'completed' : ''}">
+        <div class="progress-card module-progress-card ${pct === 100 ? 'completed' : ''}">
           <div class="progress-card-head">
             <span class="progress-card-icon">${section.icon || '📖'}</span>
             <div class="progress-card-info">
               <h4>${escapeHtml(label)} · ${escapeHtml(section.title)}</h4>
-              <span class="progress-card-meta">${taughtCount}/${total} topics · ${pct}%</span>
+              <span class="progress-card-meta">${taughtCount} / ${total} topics · ${pct}% complete</span>
             </div>
-            ${pct === 100 ? '<span class="progress-card-badge">Complete</span>' : ''}
+            ${pct === 100
+              ? '<span class="progress-card-badge complete">Complete ✓</span>'
+              : `<span class="progress-card-badge">${pct}%</span>`}
           </div>
           <div class="progress-bar-wrap small">
             <div class="progress-bar" style="width:${pct}%"></div>
@@ -192,7 +210,55 @@
       `;
     }).join('');
 
-    container.insertAdjacentHTML('afterbegin', moduleCards);
+    // === COURSE HERO (TOP SECTION) ===
+    const heroHTML = `
+      <div class="course-progress-hero" id="student-course-progress">
+        <div class="course-hero-head">
+          <span class="course-hero-kicker">📚 COURSE PROGRESS</span>
+          <h3>Your Learning Journey</h3>
+          <p>Track your journey through the Cyber Knights curriculum.</p>
+        </div>
+
+        <div class="course-hero-stats">
+          <div class="course-hero-stat main">
+            <span class="course-hero-num">${overallPct}<span class="pct-symbol">%</span></span>
+            <span class="course-hero-label">Overall Completion</span>
+          </div>
+          <div class="course-hero-stat">
+            <span class="course-hero-num">${totalTaught}<span class="divider">/</span>${totalChapters}</span>
+            <span class="course-hero-label">Topics Covered</span>
+          </div>
+          <div class="course-hero-stat highlight">
+            <span class="course-hero-num">${remaining}</span>
+            <span class="course-hero-label">Topics Remaining</span>
+          </div>
+          <div class="course-hero-stat">
+            <span class="course-hero-num">${sections.length}</span>
+            <span class="course-hero-label">Total Modules</span>
+          </div>
+        </div>
+
+        <div class="course-hero-bar-wrap">
+          <div class="course-hero-bar" style="width:${overallPct}%"></div>
+        </div>
+
+        <p class="course-hero-note">
+          ${overallPct === 100
+            ? '🎉 Congratulations! You have completed the entire curriculum!'
+            : overallPct === 0
+              ? '⚡ Your journey starts now. Every topic you cover counts!'
+              : `🚀 You're ${overallPct}% through! Just ${remaining} topic${remaining === 1 ? '' : 's'} left to finish the entire course.`}
+        </p>
+      </div>
+    `;
+
+    // Insert hero BEFORE progress-summary
+    summary.insertAdjacentHTML('beforebegin', heroHTML);
+
+    // Render module cards grid into breakdown
+    if (container) {
+      container.innerHTML = `<div class="module-progress-grid">${moduleCards}</div>`;
+    }
   }
 
   // ============================================================
