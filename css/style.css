@@ -2914,3 +2914,202 @@ body::after {
 .quiz-detail-marks { margin-top: 6px; font-size: 11.5px; color: var(--text-lo); font-family: 'JetBrains Mono', monospace; }
 
 .loading-msg, .empty-msg { padding: 40px 20px; text-align: center; color: var(--text-lo); font-size: 13px; }
+
+
+/* ============================================================
+   STUDENT COURSE PROGRESS HERO
+   ============================================================ */
+.course-progress-hero {
+  padding: 40px 36px;
+  margin-bottom: 32px;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.14), transparent 60%),
+    linear-gradient(135deg, rgba(46, 17, 32, 0.65), rgba(26, 8, 16, 0.75));
+  border: 1.5px solid rgba(212, 175, 55, 0.3);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 0 0 1px rgba(212, 175, 55, 0.05);
+  position: relative;
+  overflow: hidden;
+  animation: courseHeroIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes courseHeroIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.course-progress-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+  box-shadow: 0 0 30px #D4AF37;
+}
+
+.course-hero-head { margin-bottom: 28px; text-align: center; }
+.course-hero-kicker {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: #D4AF37;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding: 4px 12px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 100px;
+  background: rgba(212, 175, 55, 0.06);
+}
+.course-hero-head h3 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: #FAF3E3;
+  margin: 0 0 8px 0;
+}
+.course-hero-head p {
+  font-size: 13px;
+  color: #D4C5A8;
+  margin: 0;
+  opacity: 0.85;
+}
+
+.course-hero-stats {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+@media (max-width: 800px) {
+  .course-hero-stats { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .course-hero-stats { grid-template-columns: 1fr; }
+}
+
+.course-hero-stat {
+  background: rgba(26, 8, 16, 0.55);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 14px;
+  padding: 20px 16px;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+.course-hero-stat:hover {
+  border-color: rgba(212, 175, 55, 0.5);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 30px rgba(212, 175, 55, 0.1);
+}
+.course-hero-stat.main {
+  border-color: rgba(212, 175, 55, 0.5);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(26, 8, 16, 0.55));
+}
+.course-hero-stat.highlight .course-hero-num { color: #E8D5B7; }
+
+.course-hero-num {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 600;
+  color: #D4AF37;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  text-shadow: 0 0 24px rgba(212, 175, 55, 0.4);
+}
+.course-hero-stat.main .course-hero-num {
+  font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+  color: #F4E4A6;
+  text-shadow: 0 0 32px rgba(212, 175, 55, 0.6);
+}
+.course-hero-num .pct-symbol {
+  font-size: 0.55em;
+  opacity: 0.8;
+  margin-left: 2px;
+}
+.course-hero-num .divider {
+  font-size: 0.6em;
+  opacity: 0.5;
+  margin: 0 4px;
+}
+
+.course-hero-label {
+  display: block;
+  margin-top: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: #D4C5A8;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.course-hero-bar-wrap {
+  height: 10px;
+  background: rgba(212, 175, 55, 0.08);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+.course-hero-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #8B6914 0%, #D4AF37 50%, #F4E4A6 100%);
+  border-radius: 5px;
+  box-shadow: 0 0 20px #D4AF37, inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.course-hero-bar::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: courseShine 2s linear infinite;
+}
+@keyframes courseShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.course-hero-note {
+  text-align: center;
+  font-size: 13px;
+  color: #D4C5A8;
+  margin: 0;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(212, 175, 55, 0.04);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  line-height: 1.5;
+}
+
+/* Module cards grid */
+.module-progress-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+.module-progress-card {
+  background: rgba(46, 17, 32, 0.4) !important;
+  border: 1.5px solid rgba(212, 175, 55, 0.18) !important;
+}
+.module-progress-card.completed {
+  border-color: rgba(212, 175, 55, 0.5) !important;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.06), rgba(46, 17, 32, 0.4)) !important;
+}
+.progress-card-badge.complete {
+  background: rgba(212, 175, 55, 0.2) !important;
+  border-color: #D4AF37 !important;
+  color: #F4E4A6 !important;
+}
+
+@media (max-width: 600px) {
+  .course-progress-hero { padding: 28px 20px; }
+  .course-hero-stat { padding: 16px 12px; }
+  .course-hero-head h3 { font-size: 1.4rem; }
+}
