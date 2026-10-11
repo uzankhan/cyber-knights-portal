@@ -8,16 +8,12 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => document.querySelectorAll(s);
 
-  // Global state
   let currentUser = null;
   let allProfilesCache = [];
   let quizAttempt = { quiz: null, questions: [], answers: {}, timer: null, secondsLeft: 0 };
   let sessionTicker = null;
   let editingUser = null;
 
-  // ============================================================
-  // TOAST
-  // ============================================================
   function toast(msg, type = "info") {
     const c = $("#toast-container");
     if (!c) return;
@@ -28,9 +24,6 @@
     setTimeout(() => t.remove(), 3500);
   }
 
-  // ============================================================
-  // OVERLAY
-  // ============================================================
   function showOverlay(title, subtitle, durationMs = 1200) {
     const existing = document.getElementById("status-overlay");
     if (existing) existing.remove();
@@ -58,22 +51,17 @@
     }, durationMs);
   }
 
-  // ============================================================
-  // UTILITIES
-  // ============================================================
   function escapeHtml(str) {
     if (str === null || str === undefined) return "";
     return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
+      .replace(/&/g, "&")
+      .replace(/</g, "<")
+      .replace(/>/g, ">")
+      .replace(/"/g, '"')
+      .replace(/'/g, "'");
   }
 
-  function capitalize(s) {
-    return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
-  }
+  function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
 
   function fmtDate(iso) {
     if (!iso) return "—";
@@ -90,9 +78,6 @@
     return `${s}s`;
   }
 
-  // ============================================================
-  // VIEWS & PAGES
-  // ============================================================
   function showView(id) {
     $$(".view").forEach((v) => v.classList.remove("active"));
     const el = document.getElementById(id);
@@ -105,26 +90,19 @@
     if (el) el.classList.add("active");
     $$(".nav-link").forEach((l) => l.classList.toggle("active", l.dataset.page === id));
     if (id !== "admin") stopSessionTicker();
-    const sb = document.getElementById("sidebar");
-    if (sb) sb.classList.remove("open");
+
+    // Trigger v2 enhancements based on page
+    if (id === "progress" && window.CKFeaturesV2) {
+      setTimeout(() => window.CKFeaturesV2.enhanceStudentProgress(), 300);
+    }
+    if (id === "admin" && window.CKFeaturesV2) {
+      setTimeout(() => window.CKFeaturesV2.loadCurriculumProgress(), 300);
+    }
   }
 
-  // ============================================================
-  // MODALS
-  // ============================================================
-  function openModal(id) {
-    const m = document.getElementById(id);
-    if (m) m.classList.remove("hidden");
-  }
+  function openModal(id) { const m = document.getElementById(id); if (m) m.classList.remove("hidden"); }
+  function closeModal(id) { const m = document.getElementById(id); if (m) m.classList.add("hidden"); }
 
-  function closeModal(id) {
-    const m = document.getElementById(id);
-    if (m) m.classList.add("hidden");
-  }
-
-  // ============================================================
-  // SPLASH
-  // ============================================================
   function runSplash() {
     const splash = document.getElementById("splash-screen");
     if (!splash) { showView("login-view"); return; }
@@ -138,9 +116,6 @@
     }, 2200);
   }
 
-  // ============================================================
-  // LOGIN
-  // ============================================================
   async function handleLogin(e) {
     e.preventDefault();
     const errEl = document.getElementById("error-msg");
@@ -152,10 +127,7 @@
     const p = document.getElementById("password").value;
 
     if (!u || !p) {
-      if (errEl) {
-        errEl.textContent = "Please enter username and password";
-        errEl.classList.remove("hidden");
-      }
+      if (errEl) { errEl.textContent = "Please enter username and password"; errEl.classList.remove("hidden"); }
       return;
     }
 
@@ -166,33 +138,23 @@
     try {
       const r = await window.CK.login(u, p);
       if (!r.ok) {
-        if (errEl) {
-          errEl.textContent = r.message || "Access denied";
-          errEl.classList.remove("hidden");
-        }
+        if (errEl) { errEl.textContent = r.message || "Access denied"; errEl.classList.remove("hidden"); }
         await window.CK.logEvent("Login Attempt", "Password", "FAIL", r.message);
         return;
       }
 
       await window.CK.logEvent("Access Granted", "Password", "SUCCESS", `Welcome ${r.user.display_name}`);
       showOverlay("Access Granted", "Signing you in…", 1200);
-
       setTimeout(() => enterApp(r.user), 1300);
     } catch (err) {
       console.error(err);
-      if (errEl) {
-        errEl.textContent = err.message || "Login failed";
-        errEl.classList.remove("hidden");
-      }
+      if (errEl) { errEl.textContent = err.message || "Login failed"; errEl.classList.remove("hidden"); }
     } finally {
       btn.disabled = false;
       btn.textContent = "Continue";
     }
   }
 
-  // ============================================================
-  // ENTER APP
-  // ============================================================
   function enterApp(user) {
     currentUser = user;
     showView("app-view");
@@ -207,14 +169,11 @@
     showPage("dashboard");
   }
 
-  // ============================================================
-  // NAV
-  // ============================================================
   function buildNav(role) {
     const perms = {
       student: ["dashboard", "books", "records", "assignments", "quizzes", "exams", "results", "progress"],
       teacher: ["dashboard", "books", "records", "assignments", "quizzes", "exams", "results", "students", "logs"],
-      admin:   ["dashboard", "books", "records", "assignments", "quizzes", "exams", "results", "admin", "students", "logs"],
+      admin: ["dashboard", "books", "records", "assignments", "quizzes", "exams", "results", "admin", "students", "logs"],
     }[role] || [];
 
     const labels = {
@@ -234,16 +193,16 @@
       b.textContent = labels[id];
       b.addEventListener("click", () => {
         switch (id) {
-          case "logs":        loadLogs(); break;
-          case "admin":       loadAdminPanel(); break;
-          case "students":    loadStudentsPage(); break;
+          case "logs": loadLogs(); break;
+          case "admin": loadAdminPanel(); break;
+          case "students": loadStudentsPage(); break;
           case "assignments": loadAssignmentsPage(); break;
-          case "quizzes":     loadQuizzesPage(); break;
-          case "exams":       loadExamsPage(); break;
-          case "progress":    loadProgress(); break;
-          case "records":     loadRecords(); break;
-          case "results":     loadResults(); break;
-          case "books":       if (window.CKBooks) window.CKBooks.init(); break;
+          case "quizzes": loadQuizzesPage(); break;
+          case "exams": loadExamsPage(); break;
+          case "progress": loadProgress(); break;
+          case "records": loadRecords(); break;
+          case "results": loadResults(); break;
+          case "books": if (window.CKBooks) window.CKBooks.init(); break;
         }
         showPage(id);
       });
@@ -268,9 +227,6 @@
     if (el) el.classList.toggle("hidden", hide);
   }
 
-  // ============================================================
-  // DASHBOARD
-  // ============================================================
   function buildDashboard(user) {
     const cards = document.getElementById("dash-cards");
     if (cards) {
@@ -285,7 +241,7 @@
     rows.push(["Username", user.username]);
     rows.push(["Full Name", user.display_name]);
     rows.push(["Role", capitalize(user.role)]);
-    if (user.class_name) rows.push(["Class", user.class_name]);
+    if (user.class_name) rows.push(["Course", user.class_name]);
     if (user.email) rows.push(["Email", user.email]);
     if (user.mobile) rows.push(["Mobile", user.mobile]);
 
@@ -317,28 +273,22 @@
     }
   }
 
-  // ============================================================
-  // RECORDS  (FIXED — nested function bug removed)
-  // ============================================================
   async function loadRecords(forceRefresh = false) {
     const tb = document.querySelector("#records-table tbody");
     if (!tb) return;
     tb.innerHTML = `<tr><td colspan="5" style="text-align:center">Loading…</td></tr>`;
 
     const cacheKey = "ck_records_cache";
-    const cacheTTL = 5 * 60 * 1000; // 5 minutes
+    const cacheTTL = 5 * 60 * 1000;
 
     if (!forceRefresh) {
       try {
         const cached = localStorage.getItem(cacheKey);
         if (cached) {
           const { data, timestamp } = JSON.parse(cached);
-          if (Date.now() - timestamp < cacheTTL) {
-            renderRecords(data);
-            return;
-          }
+          if (Date.now() - timestamp < cacheTTL) { renderRecords(data); return; }
         }
-      } catch (_) { /* ignore corrupt cache */ }
+      } catch (_) {}
     }
 
     const r = await window.CK.listRecords();
@@ -347,10 +297,7 @@
       return;
     }
 
-    try {
-      localStorage.setItem(cacheKey, JSON.stringify({ data: r.data, timestamp: Date.now() }));
-    } catch (_) { /* ignore quota errors */ }
-
+    try { localStorage.setItem(cacheKey, JSON.stringify({ data: r.data, timestamp: Date.now() })); } catch (_) {}
     renderRecords(r.data);
   }
 
@@ -373,9 +320,6 @@
     `).join("");
   }
 
-  // ============================================================
-  // ASSIGNMENTS
-  // ============================================================
   async function loadAssignmentsPage() {
     if (currentUser.role === "student") return loadStudentAssignments();
     return loadAdminAssignments();
@@ -390,25 +334,18 @@
       window.CK.listAssignments(),
       window.CK.listMySubmissions(),
     ]);
-    if (!aRes.ok) {
-      wrap.innerHTML = `<p class="empty-msg">Error loading assignments</p>`;
-      return;
-    }
+    if (!aRes.ok) { wrap.innerHTML = `<p class="empty-msg">Error loading assignments</p>`; return; }
 
     const myAssignments = aRes.data.filter((a) => {
       if (!a.assigned_to || !a.assigned_to.length) return false;
       return a.assigned_to.includes(currentUser.id);
     });
 
-    if (!myAssignments.length) {
-      wrap.innerHTML = `<p class="empty-msg">No assignments assigned to you.</p>`;
-      return;
-    }
+    if (!myAssignments.length) { wrap.innerHTML = `<p class="empty-msg">No assignments assigned to you.</p>`; return; }
 
     const submissions = {};
     if (sRes.ok) sRes.data.forEach((s) => { submissions[s.assignment_id] = s; });
 
-    // Expose for the modal to look up submission_type
     window.__currentAssignments = myAssignments;
 
     wrap.innerHTML = myAssignments.map((a) => {
@@ -442,16 +379,11 @@
     });
   }
 
-  async function openAssignmentSubmit(aid) {
-    // Fetch assignment to get submission_type
+  function openAssignmentSubmit(aid) {
     const assignment = (window.__currentAssignments || []).find((a) => a.id == aid);
-
-    // If features-v2 loaded, use its enhanced version
-    if (window.CKFeaturesV2 && typeof window.CKFeaturesV2.prepSubmitModal === "function") {
+    if (window.CKFeaturesV2?.prepSubmitModal) {
       return window.CKFeaturesV2.prepSubmitModal(aid);
     }
-
-    // Fallback — v1 behaviour
     document.getElementById("asub-id").value = aid;
     document.getElementById("asub-content").value = "";
     document.getElementById("asub-msg").classList.add("hidden");
@@ -466,11 +398,8 @@
     msgEl.classList.add("hidden");
 
     const r = await window.CK.submitAssignment(id, content);
-    if (!r.ok) {
-      msgEl.textContent = r.error || "Submission failed";
-      msgEl.classList.remove("hidden");
-      return;
-    }
+    if (!r.ok) { msgEl.textContent = r.error || "Submission failed"; msgEl.classList.remove("hidden"); return; }
+
     await window.CK.logEvent("Assignment Submitted", "Assignment", "SUCCESS", `ID: ${id}`);
     toast("Assignment submitted!", "success");
     closeModal("assignment-submit-modal");
@@ -488,14 +417,8 @@
       window.CK.listProfiles(),
     ]);
 
-    if (!aRes.ok) {
-      wrap.innerHTML = `<p class="empty-msg">Error loading assignments</p>`;
-      return;
-    }
-    if (!aRes.data.length) {
-      wrap.innerHTML = `<p class="empty-msg">No assignments yet. Create one!</p>`;
-      return;
-    }
+    if (!aRes.ok) { wrap.innerHTML = `<p class="empty-msg">Error loading assignments</p>`; return; }
+    if (!aRes.data.length) { wrap.innerHTML = `<p class="empty-msg">No assignments yet. Create one!</p>`; return; }
 
     allProfilesCache = pRes.ok ? pRes.data : [];
     window.__currentAssignments = aRes.data;
@@ -528,12 +451,9 @@
   }
 
   async function viewAssignmentSubmissions(aid) {
-    // Prefer v2 enhanced review
-    if (window.CKFeaturesV2 && typeof window.CKFeaturesV2.viewSubmissionsWithReview === "function") {
+    if (window.CKFeaturesV2?.viewSubmissionsWithReview) {
       return window.CKFeaturesV2.viewSubmissionsWithReview(aid);
     }
-
-    // Fallback — prompt-based
     const r = await window.CK.listAllSubmissions(aid);
     if (!r.ok || !r.data.length) { toast("No submissions yet", "info"); return; }
 
@@ -543,10 +463,7 @@
       return `${name} · ${marks} marks · ${s.content ? s.content.substring(0, 40) : ""}`;
     });
 
-    const input = prompt(
-      "Submissions:\n\n" + lines.join("\n") + "\n\nTo grade, enter: studentId(prefix),marks",
-      ""
-    );
+    const input = prompt("Submissions:\n\n" + lines.join("\n") + "\n\nTo grade, enter: studentId(prefix),marks", "");
     if (!input) return;
     const [prefix, marksStr] = input.split(",");
     if (!prefix || !marksStr) return;
@@ -556,9 +473,6 @@
     if (gr.ok) toast("Graded", "success");
   }
 
-  // ============================================================
-  // CREATE ASSIGNMENT MODAL
-  // ============================================================
   function openCreateAssignmentModal() {
     document.getElementById("as-id").value = "";
     document.getElementById("as-title").value = "";
@@ -580,15 +494,10 @@
     wrap.innerHTML = `<p class="hint">Loading students…</p>`;
 
     const r = await window.CK.listProfiles();
-    if (!r.ok) {
-      wrap.innerHTML = `<p class="hint">Unable to load students</p>`;
-      return;
-    }
+    if (!r.ok) { wrap.innerHTML = `<p class="hint">Unable to load students</p>`; return; }
     const students = r.data.filter((u) => u.role === "student");
-    if (!students.length) {
-      wrap.innerHTML = `<p class="hint">No students available</p>`;
-      return;
-    }
+    if (!students.length) { wrap.innerHTML = `<p class="hint">No students available</p>`; return; }
+
     wrap.innerHTML = students.map((s) => `
       <label class="student-checkbox-item">
         <input type="checkbox" value="${escapeHtml(s.id)}" />
@@ -625,19 +534,12 @@
       submission_type, submission_instructions,
     });
 
-    if (!r.ok) {
-      msgEl.textContent = r.error || "Failed";
-      msgEl.classList.remove("hidden");
-      return;
-    }
+    if (!r.ok) { msgEl.textContent = r.error || "Failed"; msgEl.classList.remove("hidden"); return; }
     toast("Assignment created", "success");
     closeModal("assignment-modal");
     loadAdminAssignments();
   }
 
-  // ============================================================
-  // QUIZZES
-  // ============================================================
   async function loadQuizzesPage() {
     if (currentUser.role === "student") return loadStudentQuizzes();
     return loadAdminQuizzes();
@@ -769,7 +671,6 @@
 
     if (!r.ok) { toast("Submit failed", "error"); return; }
 
-    // Save detailed attempt for report card
     try {
       const submissionId = r.data?.id;
       if (submissionId) {
@@ -854,9 +755,6 @@
     );
   }
 
-  // ============================================================
-  // CREATE QUIZ MODAL
-  // ============================================================
   let quizQCounter = 0;
 
   function openCreateQuizModal() {
@@ -943,10 +841,7 @@
         correct_option: correct, marks,
       });
     }
-    if (!questions.length) {
-      msgEl.textContent = "At least one complete question required";
-      msgEl.classList.remove("hidden"); return;
-    }
+    if (!questions.length) { msgEl.textContent = "At least one complete question required"; msgEl.classList.remove("hidden"); return; }
 
     const assigned_to = getChecked("#q-students-list");
     if (!assigned_to.length) { msgEl.textContent = "Select students"; msgEl.classList.remove("hidden"); return; }
@@ -957,19 +852,12 @@
       total_marks, assigned_to, is_published: true,
     }, questions);
 
-    if (!r.ok) {
-      msgEl.textContent = r.error || "Failed";
-      msgEl.classList.remove("hidden");
-      return;
-    }
+    if (!r.ok) { msgEl.textContent = r.error || "Failed"; msgEl.classList.remove("hidden"); return; }
     toast("Quiz created", "success");
     closeModal("quiz-modal");
     loadAdminQuizzes();
   }
 
-  // ============================================================
-  // EXAMS
-  // ============================================================
   async function loadExamsPage() {
     const wrap = document.getElementById("exams-list");
     if (!wrap) return;
@@ -1042,33 +930,21 @@
       assigned_to,
     });
 
-    if (!r.ok) {
-      msgEl.textContent = r.error || "Failed";
-      msgEl.classList.remove("hidden");
-      return;
-    }
+    if (!r.ok) { msgEl.textContent = r.error || "Failed"; msgEl.classList.remove("hidden"); return; }
     toast("Exam created", "success");
     closeModal("exam-modal");
     loadExamsPage();
   }
 
-  // ============================================================
-  // RESULTS
-  // ============================================================
   async function loadResults() {
     const tb = document.querySelector("#results-table tbody");
     if (!tb) return;
     tb.innerHTML = `<tr><td colspan="5" style="text-align:center">Loading…</td></tr>`;
 
     const r = await window.CK.listMyExamResults();
-    if (!r.ok) {
-      tb.innerHTML = `<tr><td colspan="5" style="text-align:center">Error loading results</td></tr>`;
-      return;
-    }
-    if (!r.data.length) {
-      tb.innerHTML = `<tr><td colspan="5" style="text-align:center">No results yet</td></tr>`;
-      return;
-    }
+    if (!r.ok) { tb.innerHTML = `<tr><td colspan="5" style="text-align:center">Error loading results</td></tr>`; return; }
+    if (!r.data.length) { tb.innerHTML = `<tr><td colspan="5" style="text-align:center">No results yet</td></tr>`; return; }
+
     tb.innerHTML = r.data.map((res) => {
       const exam = res.exams || {};
       return `
@@ -1082,9 +958,6 @@
     }).join("");
   }
 
-  // ============================================================
-  // PROGRESS (Student)
-  // ============================================================
   async function loadProgress() {
     const summaryEl = document.getElementById("progress-summary");
     const breakdownEl = document.getElementById("progress-breakdown");
@@ -1102,19 +975,14 @@
       window.CK.listMyExamResults(),
     ]);
 
-    // Assignments
     const myAssign = (aRes.data || []).filter((a) => (a.assigned_to || []).includes(currentUser.id));
     let aEarned = 0, aPossible = 0, aAttended = 0;
     myAssign.forEach((a) => {
       aPossible += a.total_marks;
       const sub = (asgSubRes.data || []).find((s) => s.assignment_id === a.id);
-      if (sub) {
-        aAttended++;
-        aEarned += sub.marks_awarded || 0;
-      }
+      if (sub) { aAttended++; aEarned += sub.marks_awarded || 0; }
     });
 
-    // Quizzes
     const myQuizzes = (qRes.data || []).filter((q) => (q.assigned_to || []).includes(currentUser.id));
     let qEarned = 0, qPossible = 0, qAttended = 0, qPass = 0, qFail = 0;
     myQuizzes.forEach((q) => {
@@ -1128,7 +996,6 @@
       }
     });
 
-    // Exams
     const myExams = (eRes.data || []).filter((e) => (e.assigned_to || []).includes(currentUser.id));
     let eEarned = 0, ePossible = 0, eAttended = 0, ePass = 0, eFail = 0;
     myExams.forEach((e) => {
@@ -1175,15 +1042,11 @@
       card("Exams", "📚", { earned: eEarned, possible: ePossible, total: myExams.length, attended: eAttended },
         `<div><span>Pass:</span> ${ePass} · <span>Fail:</span> ${eFail}</div>`);
 
-    // Trigger v2 enhancement (curriculum tracking)
-    if (window.CKFeaturesV2 && typeof window.CKFeaturesV2.enhanceStudentProgress === "function") {
+    if (window.CKFeaturesV2?.enhanceStudentProgress) {
       setTimeout(() => window.CKFeaturesV2.enhanceStudentProgress(), 100);
     }
   }
 
-  // ============================================================
-  // PROFILE (self)
-  // ============================================================
   async function loadProfile() {
     if (!currentUser) return;
     const u = currentUser;
@@ -1210,11 +1073,7 @@
     if (pw) payload.password = pw;
 
     const r = await window.CK.updateOwnProfile(payload);
-    if (!r.ok) {
-      msgEl.textContent = r.message || "Update failed";
-      msgEl.classList.remove("hidden");
-      return;
-    }
+    if (!r.ok) { msgEl.textContent = r.message || "Update failed"; msgEl.classList.remove("hidden"); return; }
 
     const fresh = await window.CK.getCurrentUser();
     if (fresh) {
@@ -1229,9 +1088,6 @@
     document.getElementById("pf-password").value = "";
   }
 
-  // ============================================================
-  // ADMIN PANEL
-  // ============================================================
   function setupAdminTabs() {
     document.querySelectorAll(".admin-tab").forEach((tab) => {
       tab.addEventListener("click", () => {
@@ -1342,11 +1198,7 @@
     };
 
     const r = await window.CK.updateProfile(editingUser.id, payload);
-    if (!r.ok) {
-      msgEl.textContent = r.message || "Failed";
-      msgEl.classList.remove("hidden");
-      return;
-    }
+    if (!r.ok) { msgEl.textContent = r.message || "Failed"; msgEl.classList.remove("hidden"); return; }
     await window.CK.logEvent("User Updated", "Admin", "SUCCESS", editingUser.username);
     toast("Updated", "success");
     closeModal("edit-user-modal");
@@ -1355,9 +1207,6 @@
     loadAdminStats();
   }
 
-  // ============================================================
-  // SESSIONS
-  // ============================================================
   function stopSessionTicker() {
     if (sessionTicker) { clearInterval(sessionTicker); sessionTicker = null; }
   }
@@ -1382,9 +1231,6 @@
       </td></tr>`;
   }
 
-  // ============================================================
-  // STUDENTS PAGE
-  // ============================================================
   async function loadStudentsPage() {
     const tb = document.querySelector("#teacher-students-table tbody");
     if (!tb) return;
@@ -1394,10 +1240,7 @@
     if (!r.ok) { tb.innerHTML = `<tr><td colspan="5">Error</td></tr>`; return; }
 
     const students = r.data.filter((u) => u.role === "student");
-    if (!students.length) {
-      tb.innerHTML = `<tr><td colspan="5" style="text-align:center">No students</td></tr>`;
-      return;
-    }
+    if (!students.length) { tb.innerHTML = `<tr><td colspan="5" style="text-align:center">No students</td></tr>`; return; }
 
     window.__studentsCache = {};
     students.forEach((s) => { window.__studentsCache[s.id] = s; });
@@ -1419,9 +1262,6 @@
     });
   }
 
-  // ============================================================
-  // LOGS
-  // ============================================================
   async function loadLogs() {
     const tb = document.querySelector("#logs-table tbody");
     if (!tb) return;
@@ -1429,10 +1269,7 @@
 
     const r = await window.CK.listLogs();
     if (!r.ok) { tb.innerHTML = `<tr><td colspan="8">Error</td></tr>`; return; }
-    if (!r.data.length) {
-      tb.innerHTML = `<tr><td colspan="8" style="text-align:center">No events</td></tr>`;
-      return;
-    }
+    if (!r.data.length) { tb.innerHTML = `<tr><td colspan="8" style="text-align:center">No events</td></tr>`; return; }
 
     tb.innerHTML = r.data.map((l) => {
       const cls = l.result === "SUCCESS" ? "log-success"
@@ -1451,9 +1288,6 @@
     }).join("");
   }
 
-  // ============================================================
-  // TEST MATRIX
-  // ============================================================
   async function loadTestMatrix() {
     const tb = document.querySelector("#matrix-table tbody");
     if (!tb) return;
@@ -1479,9 +1313,6 @@
     });
   }
 
-  // ============================================================
-  // LOGOUT
-  // ============================================================
   async function handleLogout() {
     stopSessionTicker();
     await window.CK.logEvent("Logout", "Session", "SUCCESS", "");
@@ -1489,9 +1320,6 @@
     location.reload();
   }
 
-  // ============================================================
-  // INIT
-  // ============================================================
   function init() {
     console.log("[CK] Initializing app…");
 
@@ -1561,7 +1389,6 @@
     const ef = document.getElementById("exam-form");
     if (ef) ef.addEventListener("submit", handleCreateExam);
 
-    // Assignment submit form — v2 will attach its own handler if needed
     const asub = document.getElementById("assignment-submit-form");
     if (asub && !asub.dataset.v2handled) {
       asub.addEventListener("submit", handleAssignmentSubmit);
@@ -1632,7 +1459,7 @@
     if (el) el.addEventListener("click", fn);
   }
 
-  window.CKApp = { showPage, loadAdminPanel, loadLogs, loadTestMatrix };
+  window.CKApp = { showPage, loadAdminPanel, loadLogs, loadTestMatrix, loadStudentAssignments };
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
@@ -1686,8 +1513,8 @@
                 </select>
               </div>
               <div class="form-group">
-                <label for="cu-class">Class <span class="hint">(students only)</span></label>
-                <input type="text" id="cu-class" placeholder="e.g., 10-A" />
+                <label for="cu-course">Course <span class="hint">(students only)</span></label>
+                <input type="text" id="cu-course" placeholder="e.g., Cybersecurity Fundamentals" />
               </div>
             </div>
             <div class="form-group" style="margin-top:16px;">
@@ -1724,7 +1551,7 @@
     const email = document.getElementById('cu-email').value.trim();
     const mobile = document.getElementById('cu-mobile').value.trim();
     const role = document.getElementById('cu-role').value;
-    const klass = document.getElementById('cu-class').value.trim();
+    const course = document.getElementById('cu-course').value.trim();
     const password = document.getElementById('cu-password').value;
     const msg = document.getElementById('create-user-msg');
 
@@ -1738,11 +1565,10 @@
     }
 
     try {
-      // Use CK API — this handles Supabase auth + profile creation
       if (window.CK && typeof window.CK.createUser === 'function') {
         const r = await window.CK.createUser({
           username, display_name: displayName, email, mobile, role,
-          class_name: klass, password,
+          class_name: course, password,
         });
         if (!r.ok) throw new Error(r.error || 'Creation failed');
       } else {
