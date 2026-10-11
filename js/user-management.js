@@ -1,5 +1,5 @@
 /* ============================================================
-   CYBER KNIGHTS — User Management (Add User + Sync)
+   Cyber Knights — User Management
    ============================================================ */
 (function () {
   "use strict";
@@ -7,7 +7,6 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  /* -------- Create User Modal -------- */
   function openCreateModal() {
     const modal = $('#create-user-modal');
     if (!modal) return;
@@ -32,15 +31,15 @@
 
     const payload = {
       username: $('#cu-username').value.trim(),
-      displayName: $('#cu-display').value.trim(),
+      display_name: $('#cu-display').value.trim(),
       email: $('#cu-email').value.trim(),
       mobile: $('#cu-mobile').value.trim(),
       role: $('#cu-role').value,
-      course: $('#cu-course').value.trim(),
+      class_name: $('#cu-course').value.trim(),
       password: $('#cu-password').value,
     };
 
-    if (!payload.username || !payload.displayName || !payload.password) {
+    if (!payload.username || !payload.display_name || !payload.password) {
       msg.textContent = 'Username, name, and password are required.';
       msg.classList.remove('hidden');
       return;
@@ -52,77 +51,32 @@
     }
 
     try {
-      // Try multiple paths to create user
-      let success = false;
-
-      // Path 1: Supabase-backed via global function
-      if (typeof window.createUserAccount === 'function') {
-        await window.createUserAccount(payload);
-        success = true;
-      }
-      // Path 2: CKAuth API
-      else if (window.CKAuth && typeof window.CKAuth.createUser === 'function') {
-        await window.CKAuth.createUser(payload);
-        success = true;
-      }
-      // Path 3: Supabase client directly
-      else if (window.supabaseClient && window.supabaseClient.auth) {
-        const { data, error } = await window.supabaseClient.auth.signUp({
-          email: payload.email || `${payload.username}@cyberknights.local`,
-          password: payload.password,
-          options: {
-            data: {
-              username: payload.username,
-              display_name: payload.displayName,
-              role: payload.role,
-              course: payload.course,
-              mobile: payload.mobile,
-            }
-          }
-        });
-        if (error) throw error;
-        success = true;
-      }
-      // Path 4: localStorage fallback
-      else {
-        const users = JSON.parse(localStorage.getItem('ck_users') || '[]');
-        if (users.some(u => u.username === payload.username)) {
-          throw new Error('Username already exists');
-        }
-        users.push({
-          ...payload,
-          id: 'u_' + Date.now(),
-          createdAt: new Date().toISOString()
-        });
-        localStorage.setItem('ck_users', JSON.stringify(users));
-        success = true;
+      if (window.CK?.createUser) {
+        const r = await window.CK.createUser(payload);
+        if (!r.ok) throw new Error(r.error || 'Creation failed');
+      } else {
+        throw new Error('CK.createUser is not available');
       }
 
-      if (success) {
-        closeCreateModal();
-        // Trigger refresh across all tables
-        window.dispatchEvent(new CustomEvent('ck:users-changed'));
-
-        const toast = document.createElement('div');
-        toast.className = 'toast success';
-        toast.textContent = `User "${payload.username}" created`;
-        document.getElementById('toast-container')?.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-      }
+      closeCreateModal();
+      window.dispatchEvent(new CustomEvent('ck:users-changed'));
+      const toast = document.createElement('div');
+      toast.className = 'toast success';
+      toast.textContent = `User "${payload.username}" created`;
+      document.getElementById('toast-container')?.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
     } catch (err) {
       msg.textContent = err.message || 'Failed to create user.';
       msg.classList.remove('hidden');
     }
   }
 
-  /* -------- Wire Everything Up -------- */
   function attach() {
     const addBtn = $('#btn-add-user');
     if (addBtn && !addBtn.dataset.bound) {
       addBtn.addEventListener('click', openCreateModal);
       addBtn.dataset.bound = '1';
     }
-
     const form = $('#create-user-form');
     if (form && !form.dataset.bound) {
       form.addEventListener('submit', handleCreateUser);
@@ -130,14 +84,9 @@
     }
   }
 
-  // Global click handler for close buttons
   document.addEventListener('click', (e) => {
-    if (e.target.closest('[data-close-modal="create-user-modal"]')) {
-      closeCreateModal();
-    }
-    if (e.target.id === 'create-user-modal') {
-      closeCreateModal();
-    }
+    if (e.target.closest('[data-close-modal="create-user-modal"]')) closeCreateModal();
+    if (e.target.id === 'create-user-modal') closeCreateModal();
   });
 
   if (document.readyState === 'loading') {
@@ -146,7 +95,6 @@
     attach();
   }
 
-  // Re-attach when admin tab changes
   document.addEventListener('click', (e) => {
     if (e.target.closest('.admin-tab')) setTimeout(attach, 50);
   });
