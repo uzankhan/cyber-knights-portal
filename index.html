@@ -497,30 +497,30 @@
       </section>
 
       <section id="page-results" class="page">
-        <h2>Examination Results</h2>
-        <p class="page-sub">Latest exam scores.</p>
+  <h2>Examination Results</h2>
+  <p class="page-sub">Latest exam scores.</p>
 
-        <div class="results-tabs">
-          <button class="results-tab active" data-rtab="exams">Exam Results</button>
-          <button class="results-tab" data-rtab="report">My Report Card</button>
-        </div>
+  <div class="results-tabs">
+    <button class="results-tab active" data-rtab="exams">Exam Results</button>
+    <button class="results-tab" data-rtab="report">My Report Card</button>
+  </div>
 
-        <div id="results-exams-view">
-          <div class="table-wrap">
-            <table class="data-table" id="results-table">
-              <thead>
-                <tr><th>Student</th><th>Exam</th><th>Score</th><th>Total</th><th>Grade</th></tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+  <div id="results-exams-view">
+    <div class="table-wrap">
+      <table class="data-table" id="results-table">
+        <thead>
+          <tr><th>Student</th><th>Exam</th><th>Score</th><th>Total</th><th>Grade</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
 
-        <div id="results-report-view" class="hidden">
-          <div id="report-card-summary"></div>
-          <div id="report-card-detail"></div>
-        </div>
-      </section>
+  <div id="results-report-view" class="hidden">
+    <div id="report-card-summary"></div>
+    <div id="report-card-detail"></div>
+  </div>
+</section>
 
       <section id="page-progress" class="page">
         <h2>My Progress</h2>
@@ -969,11 +969,11 @@
         <p class="page-sub">Full control over users, sessions and system.</p>
 
         <div class="admin-tabs">
-          <button class="admin-tab active" data-tab="overview">Overview</button>
-          <button class="admin-tab" data-tab="curriculum">Curriculum Progress</button>
-          <button class="admin-tab" data-tab="users">Users</button>
-          <button class="admin-tab" data-tab="sessions">Active Sessions</button>
-          <button class="admin-tab" data-tab="books">Book Manager</button>
+           <button class="admin-tab active" data-tab="overview">Overview</button>
+           <button class="admin-tab" data-tab="curriculum">Curriculum Progress</button>
+           <button class="admin-tab" data-tab="users">Users</button>
+           <button class="admin-tab" data-tab="sessions">Active Sessions</button>
+           <button class="admin-tab" data-tab="books">Book Manager</button>
         </div>
 
         <div id="admin-tab-overview" class="admin-tab-content active">
@@ -981,14 +981,14 @@
         </div>
 
         <div id="admin-tab-curriculum" class="admin-tab-content">
-          <div class="admin-toolbar">
-            <button class="btn-secondary" id="btn-refresh-curriculum">Refresh</button>
-            <span class="curriculum-hint">✓ Tick each topic as you teach it. Students' progress updates automatically.</span>
-          </div>
-          <div id="curriculum-progress-list" class="curriculum-progress-list">
-            <div class="loading-msg">Loading curriculum…</div>
-          </div>
-        </div>
+  <div class="admin-toolbar">
+    <button class="btn-secondary" id="btn-refresh-curriculum">Refresh</button>
+    <span class="curriculum-hint">✓ Tick each topic as you teach it. Students' progress updates automatically.</span>
+  </div>
+  <div id="curriculum-progress-list" class="curriculum-progress-list">
+    <div class="loading-msg">Loading curriculum…</div>
+  </div>
+</div>
 
         <div id="admin-tab-users" class="admin-tab-content">
           <div class="admin-toolbar">
@@ -1363,41 +1363,41 @@
 
   <!-- ASSIGNMENT SUBMIT MODAL -->
   <div id="assignment-submit-modal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3>Submit Assignment</h3>
-        <button class="modal-close" data-close-modal="assignment-submit-modal">×</button>
-      </div>
-      <form id="assignment-submit-form" class="modal-body">
-        <input type="hidden" id="asub-id" />
-        <input type="hidden" id="asub-type" value="text" />
-
-        <div class="submission-hint hidden" id="asub-hint"></div>
-
-        <div class="form-group" id="asub-text-group">
-          <label>Your Answer</label>
-          <textarea id="asub-content" rows="6" placeholder="Write your answer here…"></textarea>
-        </div>
-
-        <div class="form-group hidden" id="asub-link-group">
-          <label>Submission Link</label>
-          <input type="url" id="asub-link" placeholder="https://github.com/username/repo" />
-        </div>
-
-        <div class="form-group hidden" id="asub-file-group">
-          <label>Upload File (PDF, DOC, DOCX, ZIP, TXT — Max 10 MB)</label>
-          <input type="file" id="asub-file" accept=".pdf,.doc,.docx,.zip,.txt,.png,.jpg,.jpeg" />
-          <div class="file-preview hidden" id="asub-file-preview"></div>
-        </div>
-
-        <div id="asub-msg" class="error-msg hidden"></div>
-        <div class="modal-actions">
-          <button type="button" class="btn-secondary" data-close-modal="assignment-submit-modal">Cancel</button>
-          <button type="submit" class="btn-primary">Submit</button>
-        </div>
-      </form>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>Submit Assignment</h3>
+      <button class="modal-close" data-close-modal="assignment-submit-modal">×</button>
     </div>
+    <form id="assignment-submit-form" class="modal-body">
+      <input type="hidden" id="asub-id" />
+      <input type="hidden" id="asub-type" value="text" />
+
+      <div class="submission-hint hidden" id="asub-hint"></div>
+
+      <div class="form-group" id="asub-text-group">
+        <label>Your Answer</label>
+        <textarea id="asub-content" rows="6" placeholder="Write your answer here…"></textarea>
+      </div>
+
+      <div class="form-group hidden" id="asub-link-group">
+        <label>Submission Link</label>
+        <input type="url" id="asub-link" placeholder="https://github.com/username/repo" />
+      </div>
+
+      <div class="form-group hidden" id="asub-file-group">
+        <label>Upload File (PDF, DOC, DOCX, ZIP, TXT — Max 10 MB)</label>
+        <input type="file" id="asub-file" accept=".pdf,.doc,.docx,.zip,.txt,.png,.jpg,.jpeg" />
+        <div class="file-preview hidden" id="asub-file-preview"></div>
+      </div>
+
+      <div id="asub-msg" class="error-msg hidden"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" data-close-modal="assignment-submit-modal">Cancel</button>
+        <button type="submit" class="btn-primary">Submit</button>
+      </div>
+    </form>
   </div>
+</div>
 
   <!-- CREATE EXAM MODAL -->
   <div id="exam-modal" class="modal-overlay hidden">
