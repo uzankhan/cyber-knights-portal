@@ -1,5 +1,5 @@
 /* ============================================================
-   CYBER KNIGHTS — Features V2
+   Cyber Knights — Features V2
    Progress Tracking · Assignment Types · Report Card
    Modular — hooks into existing app.js without breaking it
    ============================================================ */
@@ -11,12 +11,8 @@
   const sb = () => window.CK?.supabase || window.supabaseClient;
   const user = () => window.CK?.currentUser || window.currentUser || null;
 
-  // ============================================================
-  // UTILITIES
-  // ============================================================
   function escapeHtml(s) {
-    return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    return String(s ?? '').replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"');
   }
   function fmtDate(iso) {
     if (!iso) return '—';
@@ -75,9 +71,7 @@
             <span class="curriculum-module-icon">${section.icon || '📖'}</span>
             <div>
               <h4>${escapeHtml(label)} · ${escapeHtml(section.title)}</h4>
-              <span class="curriculum-module-meta">
-                ${taughtCount}/${section.chapters.length} topics taught
-              </span>
+              <span class="curriculum-module-meta">${taughtCount}/${section.chapters.length} topics taught</span>
             </div>
           </div>
           <ul class="curriculum-chapter-list">
@@ -162,7 +156,6 @@
     const sections = bookData?.sections || [];
     if (!sections.length) return;
 
-    // Add module progress cards before the existing breakdown
     const moduleCards = sections.map(section => {
       const isFront = section.type === 'matter';
       const label = isFront ? 'Front Matter' : `Module ${String(section.number).padStart(2, '0')}`;
@@ -199,35 +192,27 @@
       `;
     }).join('');
 
-    // Insert module cards at top of breakdown
     container.insertAdjacentHTML('afterbegin', moduleCards);
   }
 
   // ============================================================
   // FEATURE 2: ASSIGNMENT — Link/File/Text Submission
   // ============================================================
-  function enhanceAssignmentCreateForm() {
-    // Already handled in HTML — nothing extra needed
-  }
-
   function enhanceAssignmentSubmitModal() {
-    // Hook into existing submit button
     document.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-submit-assignment]');
+      const btn = e.target.closest('[data-submit]');
       if (btn) {
-        const aid = btn.dataset.submitAssignment;
+        const aid = btn.dataset.submit;
         setTimeout(() => prepSubmitModal(aid), 50);
       }
     });
 
-    // Also hook on submit button inside assignment submit modal
     const form = $('#assignment-submit-form');
     if (form && !form.dataset.v2bound) {
       form.dataset.v2bound = 'true';
       form.addEventListener('submit', handleV2AssignmentSubmit);
     }
 
-    // File input preview
     const fileInput = $('#asub-file');
     if (fileInput && !fileInput.dataset.v2bound) {
       fileInput.dataset.v2bound = 'true';
@@ -245,16 +230,13 @@
     const sb_client = sb();
     if (!sb_client) return;
 
-    // Fetch assignment to get submission_type
-    const { data: assignment } = await sb_client
-      .from('assignments').select('*').eq('id', aid).single();
+    const { data: assignment } = await sb_client.from('assignments').select('*').eq('id', aid).single();
     if (!assignment) return;
 
     const type = assignment.submission_type || 'text';
     $('#asub-id').value = aid;
     $('#asub-type').value = type;
 
-    // Reset all groups
     $('#asub-text-group')?.classList.add('hidden');
     $('#asub-link-group')?.classList.add('hidden');
     $('#asub-file-group')?.classList.add('hidden');
@@ -270,7 +252,6 @@
       h.classList.remove('hidden');
     }
 
-    // Clear previous values
     if ($('#asub-link')) $('#asub-link').value = '';
     if ($('#asub-content')) $('#asub-content').value = '';
     if ($('#asub-file')) $('#asub-file').value = '';
@@ -279,12 +260,9 @@
   }
 
   async function handleV2AssignmentSubmit(e) {
-    // Only handle if this modal is using v2 fields
     const typeField = $('#asub-type');
-    if (!typeField) return; // v1 modal — let original handler run
-
+    if (!typeField) return;
     const type = typeField.value;
-    // If text type, let original handler handle it
     if (type === 'text') return;
 
     e.preventDefault();
@@ -353,8 +331,8 @@
       $('#assignment-submit-modal')?.classList.add('hidden');
       window.dispatchEvent(new CustomEvent('ck:activity-completed'));
 
-      // Reload assignments if possible
-      if (window.CK?.loadStudentAssignments) window.CK.loadStudentAssignments();
+      if (window.CKApp?.loadStudentAssignments) window.CKApp.loadStudentAssignments();
+      else if (window.CK?.loadStudentAssignments) window.CK.loadStudentAssignments();
     } catch (err) {
       console.error(err);
       msg.textContent = err.message || 'Submission failed';
@@ -398,7 +376,6 @@
     summary.innerHTML = '<div class="loading-msg">Loading report card…</div>';
     detail.innerHTML = '';
 
-    // Load all activities
     const [quizRes, assignRes, examRes] = await Promise.all([
       sb().from('quiz_submissions')
         .select('id, quiz_id, score, total, finalized, submitted_at, quizzes(title, total_marks)')
@@ -704,7 +681,6 @@
     }
   });
 
-  // Refresh curriculum button
   document.addEventListener('click', (e) => {
     if (e.target.id === 'btn-refresh-curriculum') loadCurriculumProgress();
   });
@@ -719,14 +695,12 @@
     }
   });
 
-  // Auto-enhance on load if progress page is active
   if (document.readyState !== 'loading') {
     setTimeout(() => {
       if ($('#page-progress.active') || $('#progress-breakdown')) enhanceStudentProgress();
     }, 1500);
   }
 
-  // Activity completed → refresh report card
   window.addEventListener('ck:activity-completed', () => {
     if (!$('#results-report-view')?.classList.contains('hidden')) loadReportCard();
   });
@@ -736,7 +710,6 @@
   // ============================================================
   function init() {
     enhanceAssignmentSubmitModal();
-    enhanceAssignmentCreateForm();
     bindResultsTabs();
     console.log('[CK] Features V2 ready');
   }
@@ -747,11 +720,11 @@
     setTimeout(init, 500);
   }
 
-  // Expose for debug
   window.CKFeaturesV2 = {
     loadCurriculumProgress,
     loadReportCard,
     enhanceStudentProgress,
-    viewSubmissionsWithReview
+    viewSubmissionsWithReview,
+    prepSubmitModal,
   };
 })();
