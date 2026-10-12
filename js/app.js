@@ -388,23 +388,26 @@
     openModal("assignment-submit-modal");
   }
 
-  async function handleAssignmentSubmit(e) {
-    e.preventDefault();
-    const id = document.getElementById("asub-id").value;
-    const content = document.getElementById("asub-content").value;
-    const msgEl = document.getElementById("asub-msg");
-    msgEl.classList.add("hidden");
+ async function handleAssignmentSubmit(e) {
+  // v2 handles link/file — skip if not text
+  const type = document.getElementById("asub-type")?.value || "text";
+  if (type !== "text") return;
 
-    const r = await window.CK.submitAssignment(id, content);
-    if (!r.ok) { msgEl.textContent = r.error || "Submission failed"; msgEl.classList.remove("hidden"); return; }
+  e.preventDefault();
+  const id = document.getElementById("asub-id").value;
+  const content = document.getElementById("asub-content").value;
+  const msgEl = document.getElementById("asub-msg");
+  msgEl.classList.add("hidden");
 
-    await window.CK.logEvent("Assignment Submitted", "Assignment", "SUCCESS", `ID: ${id}`);
-    toast("Assignment submitted!", "success");
-    closeModal("assignment-submit-modal");
-    loadStudentAssignments();
-    window.dispatchEvent(new CustomEvent("ck:activity-completed"));
-  }
+  const r = await window.CK.submitAssignment(id, content);
+  if (!r.ok) { msgEl.textContent = r.error || "Submission failed"; msgEl.classList.remove("hidden"); return; }
 
+  await window.CK.logEvent("Assignment Submitted", "Assignment", "SUCCESS", `ID: ${id}`);
+  toast("Assignment submitted!", "success");
+  closeModal("assignment-submit-modal");
+  loadStudentAssignments();
+  window.dispatchEvent(new CustomEvent("ck:activity-completed"));
+}
   async function loadAdminAssignments() {
     const wrap = document.getElementById("assignments-list");
     if (!wrap) return;
