@@ -1,6 +1,6 @@
 /* ============================================================
    Cyber Knights — Full Application Controller (Supabase)
-   Fixed: nested loadRecords bug, user-management IIFE
+   Fixed: quiz submit button, escapeHtml entities
    ============================================================ */
 (function () {
   "use strict";
@@ -54,11 +54,11 @@
   function escapeHtml(str) {
     if (str === null || str === undefined) return "";
     return String(str)
-      .replace(/&/g, "&")
-      .replace(/</g, "<")
-      .replace(/>/g, ">")
-      .replace(/"/g, '"')
-      .replace(/'/g, "'");
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
@@ -91,7 +91,6 @@
     $$(".nav-link").forEach((l) => l.classList.toggle("active", l.dataset.page === id));
     if (id !== "admin") stopSessionTicker();
 
-    // Trigger v2 enhancements based on page
     if (id === "progress" && window.CKFeaturesV2) {
       setTimeout(() => window.CKFeaturesV2.enhanceStudentProgress(), 300);
     }
@@ -380,7 +379,6 @@
   }
 
   function openAssignmentSubmit(aid) {
-    const assignment = (window.__currentAssignments || []).find((a) => a.id == aid);
     if (window.CKFeaturesV2?.prepSubmitModal) {
       return window.CKFeaturesV2.prepSubmitModal(aid);
     }
@@ -656,6 +654,10 @@
   async function finalizeQuiz() {
     if (quizAttempt.timer) clearInterval(quizAttempt.timer);
 
+    // Guard: prevent double submit
+    if (quizAttempt._submitting) return;
+    quizAttempt._submitting = true;
+
     let score = 0, total = 0;
     quizAttempt.questions.forEach((q) => {
       total += q.marks;
@@ -669,10 +671,15 @@
       score, total, true
     );
 
-    if (!r.ok) { toast("Submit failed", "error"); return; }
+    if (!r.ok) {
+      quizAttempt._submitting = false;
+      toast("Submit failed", "error");
+      return;
+    }
 
+    // Save detailed attempt for report card
     try {
-      const submissionId = r.data?.id;
+      const submissionId = r.data?.id || r.data?.quiz_submission_id;
       if (submissionId) {
         const details = quizAttempt.questions.map((q) => {
           const given = (quizAttempt.answers[String(q.id)] || "").toUpperCase();
@@ -687,7 +694,10 @@
             marks_possible: q.marks || 1,
           };
         });
-        await window.CK.supabase.from("quiz_attempt_details").insert(details);
+        // Delete old then insert new
+        await window.CK.supabase.from("quiz_attempt_details").delete().eq("submission_id", submissionId);
+        const { error: detErr } = await window.CK.supabase.from("quiz_attempt_details").insert(details);
+        if (detErr) console.warn("Detail insert failed:", detErr.message);
       }
     } catch (e) { console.warn("Detail save failed:", e); }
 
@@ -1394,14 +1404,23 @@
       asub.addEventListener("submit", handleAssignmentSubmit);
     }
 
+    // ============================================================
+    // QUIZ SUBMIT BUTTONS
+    // ============================================================
+    // Primary submit button ("Submit Answers") — goes straight to finalize
+    const qSubmit = document.getElementById("btn-quiz-submit");
+    if (qSubmit) qSubmit.addEventListener("click", finalizeQuiz);
+
+    // Secondary finalize button (if review step used)
+    const qFin = document.getElementById("btn-quiz-finalize");
+    if (qFin) qFin.addEventListener("click", finalizeQuiz);
+
+    // Back button — hidden review step, but kept for safety
     const qBack = document.getElementById("btn-quiz-back");
     if (qBack) qBack.addEventListener("click", () => {
       document.getElementById("quiz-review-body")?.classList.add("hidden");
       document.getElementById("quiz-attempt-body")?.classList.remove("hidden");
     });
-
-    const qFin = document.getElementById("btn-quiz-finalize");
-    if (qFin) qFin.addEventListener("click", finalizeQuiz);
 
     const addQ = document.getElementById("btn-add-question");
     if (addQ) addQ.addEventListener("click", addQuizQuestion);
