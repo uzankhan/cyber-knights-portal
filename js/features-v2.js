@@ -290,38 +290,44 @@
   }
 
   async function prepSubmitModal(aid) {
-    const sb_client = sb();
-    if (!sb_client) return;
+  const sb_client = sb();
+  if (!sb_client) return;
 
-    const { data: assignment } = await sb_client.from('assignments').select('*').eq('id', aid).single();
-    if (!assignment) return;
-
-    const type = assignment.submission_type || 'text';
-    $('#asub-id').value = aid;
-    $('#asub-type').value = type;
-
-    $('#asub-text-group')?.classList.add('hidden');
-    $('#asub-link-group')?.classList.add('hidden');
-    $('#asub-file-group')?.classList.add('hidden');
-    $('#asub-hint')?.classList.add('hidden');
-
-    if (type === 'link') $('#asub-link-group')?.classList.remove('hidden');
-    else if (type === 'file') $('#asub-file-group')?.classList.remove('hidden');
-    else $('#asub-text-group')?.classList.remove('hidden');
-
-    if (assignment.submission_instructions) {
-      const h = $('#asub-hint');
-      h.textContent = '📌 ' + assignment.submission_instructions;
-      h.classList.remove('hidden');
-    }
-
-    if ($('#asub-link')) $('#asub-link').value = '';
-    if ($('#asub-content')) $('#asub-content').value = '';
-    if ($('#asub-file')) $('#asub-file').value = '';
-    $('#asub-file-preview')?.classList.add('hidden');
-    $('#asub-msg')?.classList.add('hidden');
+  const { data: assignment } = await sb_client.from('assignments').select('*').eq('id', aid).single();
+  if (!assignment) {
+    toast('Assignment not found', 'error');
+    return;
   }
 
+  const type = assignment.submission_type || 'text';
+  $('#asub-id').value = aid;
+  $('#asub-type').value = type;
+
+  $('#asub-text-group')?.classList.add('hidden');
+  $('#asub-link-group')?.classList.add('hidden');
+  $('#asub-file-group')?.classList.add('hidden');
+  $('#asub-hint')?.classList.add('hidden');
+
+  if (type === 'link') $('#asub-link-group')?.classList.remove('hidden');
+  else if (type === 'file') $('#asub-file-group')?.classList.remove('hidden');
+  else $('#asub-text-group')?.classList.remove('hidden');
+
+  if (assignment.submission_instructions) {
+    const h = $('#asub-hint');
+    h.textContent = '📌 ' + assignment.submission_instructions;
+    h.classList.remove('hidden');
+  }
+
+  if ($('#asub-link')) $('#asub-link').value = '';
+  if ($('#asub-content')) $('#asub-content').value = '';
+  if ($('#asub-file')) $('#asub-file').value = '';
+  $('#asub-file-preview')?.classList.add('hidden');
+  $('#asub-msg')?.classList.add('hidden');
+
+  // ⚡ MISSING LINE — modal open karo!
+  const modal = document.getElementById('assignment-submit-modal');
+  if (modal) modal.classList.remove('hidden');
+}
   async function handleV2AssignmentSubmit(e) {
     const typeField = $('#asub-type');
     if (!typeField) return;
